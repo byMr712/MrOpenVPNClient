@@ -16,6 +16,9 @@ object VpnPrefs {
     private const val KEY_LIGHT_THEME = "light_theme"
     private const val KEY_ACCENT = "accent_color"
     private const val KEY_STATUS_ANIM = "status_outline_anim"
+    private const val KEY_PROFILE_ANIM = "profile_outline_anim"
+    private const val KEY_ANIM_SYNC = "anim_sync_with_status"
+    private const val KEY_PROFILE_ORDER = "profile_order"
 
     fun notifyEnabled(context: Context): Boolean =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -101,6 +104,43 @@ object VpnPrefs {
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_STATUS_ANIM, id)
+            .apply()
+    }
+
+    fun profileOutlineAnim(context: Context): String =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getString(KEY_PROFILE_ANIM, "pulse")
+            ?: "pulse"
+
+    fun setProfileOutlineAnim(context: Context, id: String) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_PROFILE_ANIM, id)
+            .apply()
+    }
+
+    fun animSyncStatus(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getBoolean(KEY_ANIM_SYNC, true)
+
+    fun setAnimSyncStatus(context: Context, value: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_ANIM_SYNC, value)
+            .apply()
+    }
+
+    fun profileOrder(context: Context): List<String> =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getString(KEY_PROFILE_ORDER, null)
+            ?.split("|")
+            ?.filter { it.isNotBlank() }
+            ?: emptyList()
+
+    fun setProfileOrder(context: Context, uuids: List<String>) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_PROFILE_ORDER, uuids.joinToString("|"))
             .apply()
     }
 

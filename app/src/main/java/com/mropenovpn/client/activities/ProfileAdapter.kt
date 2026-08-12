@@ -1,8 +1,5 @@
 package com.mropenovpn.client.activities
 
-import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.mropenovpn.client.ExperimentalThemes
 import com.mropenovpn.client.R
+import com.mropenovpn.client.VpnPrefs
 import de.blinkt.openvpn.VpnProfile
+import de.blinkt.openvpn.core.ConnectionStatus
 import de.blinkt.openvpn.core.VpnStatus
 
 class ProfileAdapter(
@@ -22,6 +21,8 @@ class ProfileAdapter(
 ) : RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder>() {
 
     private val profiles = mutableListOf<VpnProfile>()
+    private var currentLevel: ConnectionStatus = ConnectionStatus.LEVEL_NOTCONNECTED
+    private val animators = mutableListOf<StatusOutlineAnimator>()
 
     fun setProfiles(newProfiles: List<VpnProfile>) {
         profiles.clear()
@@ -29,10 +30,21 @@ class ProfileAdapter(
         notifyDataSetChanged()
     }
 
+    fun setLevel(level: ConnectionStatus) {
+        currentLevel = level
+        notifyDataSetChanged()
+    }
+
+    fun stopAnimations() {
+        animators.forEach { it.stop() }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_profile, parent, false)
-        return ProfileViewHolder(view)
+        val holder = ProfileViewHolder(view)
+        animators.add(holder.animator)
+        return holder
     }
 
     override fun getItemCount(): Int = profiles.size
@@ -47,6 +59,14 @@ class ProfileAdapter(
         private val userText: TextView = itemView.findViewById(R.id.profileUserText)
         private val connectButton: Button = itemView.findViewById(R.id.connectButton)
         private val card = itemView as MaterialCardView
+
+        val animator = StatusOutlineAnimator(itemView.context, card) { ctx ->
+            if (VpnPrefs.animSyncStatus(ctx)) {
+                VpnPrefs.statusOutlineAnim(ctx)
+            } else {
+                VpnPrefs.profileOutlineAnim(ctx)
+            }
+        }
 
         fun bind(profile: VpnProfile) {
             nameText.text = profile.mName
@@ -65,33 +85,17 @@ class ProfileAdapter(
             connectButton.setOnClickListener {
                 if (active) onDisconnect() else onConnect(profile)
             }
-            applyActiveOutline(active)
+            animator.setState(outlineStateFor(active))
         }
 
-        private fun applyActiveOutline(active: Boolean) {
-            val density = itemView.resources.displayMetrics.density
-            if (active) {
-                card.strokeWidth = (2 * density).toInt()
-                card.setStrokeColor(
-                    ColorStateList.valueOf(
-                        ExperimentalThemes.accentOrDefaultColor(
-                            itemView.context,
-                            primaryColor(itemView.context)
-                        )
-                    )
-                )
+        private fun outlineStateFor(active: Boolean): StatusOutlineAnimator.State =
+            if (!active) {
+                StatusOutlineAnimator.State.DISCONNECTED
             } else {
-                card.strokeWidth = 0
+                when (currentLevel) {
+                    ConnectionStatus.LEVEL_CONNECTED -> StatusOutlineAnimator.State.CONNECTED
+                    else -> StatusOutlineAnimator.State.CONNECTING
+                }
             }
-        }
-
-        private fun primaryColor(context: Context): Int {
-            val ta = context.theme.obtainStyledAttributes(
-                intArrayOf(com.google.android.material.R.attr.colorPrimary)
-            )
-            val color = ta.getColor(0, Color.BLACK)
-            ta.recycle()
-            return color
-        }
     }
 }

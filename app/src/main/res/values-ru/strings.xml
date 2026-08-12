@@ -92,7 +92,7 @@
     <string name="settings_show_notification_summary">Статус подключения и кнопка «Отключить»</string>
 
     <string name="settings_connection_section">Подключение</string>
-    <string name="settings_appearance_section">Тема приложения</string>
+    <string name="settings_appearance_section">Кастомизация</string>
     <string name="settings_debug_section">Отладка</string>
     <string name="settings_data_section">Данные</string>
     <string name="settings_auto_connect">Автоподключение</string>
@@ -103,8 +103,8 @@
     <string name="settings_net_change_reconnect_summary">Перезапускать соединение при потере сети</string>
     <string name="settings_debug_mode">Режим отладки</string>
     <string name="settings_debug_mode_summary">Показывать кнопку «Копировать логи»</string>
-    <string name="settings_experimental_themes">Тема приложения</string>
-    <string name="settings_experimental_themes_summary">Альтернативные дизайны приложения</string>
+    <string name="settings_experimental_themes">Темы приложения</string>
+    <string name="settings_experimental_themes_summary">Альтернативные дизайны</string>
     <string name="clear_users">Удалить всех пользователей</string>
     <string name="clear_users_confirm">Удалить все сохранённые логины и пароли?</string>
     <string name="settings_version">Версия: %1$s</string>
@@ -129,4 +129,23 @@
     <string name="accent_title">Цвет-акцент</string>
     <string name="accent_hint">Применяется сразу, без перезапуска</string>
     <string name="accent_custom_hint">Свой цвет: HEX (например, #1E88E5 или 1E88E5)</string>
+
+    <string name="settings_status_animations">Анимации приложения</string>
+    <string name="settings_status_animations_summary">Альтернативные анимации</string>
+    <string name="status_animations_title">Анимации окна статуса</string>
+    <string name="profile_animations_title">Анимации выбранного профиля</string>
+    <string name="anim_sync_title">Синхронизировать все анимации с окном статуса</string>
+    <string name="anim_sync_summary">Все анимации будут такими же, как у окна статуса</string>
+    <string name="anim_sync_status_summary">Анимация рамки окна статуса</string>
+    <string name="anim_sync_profile_summary">Анимация рамки выбранного профиля</string>
+    <string name="anim_off_name">Без анимации</string>
+    <string name="anim_off_desc">Рамка остаётся серой во время подключения</string>
+    <string name="anim_pulse_name">Пульс</string>
+    <string name="anim_pulse_desc">Рамка плавно меняет цвет</string>
+    <string name="anim_blink_name">Мигание</string>
+    <string name="anim_blink_desc">Рамка мигает</string>
+    <string name="anim_rainbow_name">Радуга</string>
+    <string name="anim_rainbow_desc">Рамка переливается всеми цветами</string>
+    <string name="anim_throb_name">Толчок</string>
+    <string name="anim_throb_desc">Рамка пульсирует толщиной</string>
 </resources>

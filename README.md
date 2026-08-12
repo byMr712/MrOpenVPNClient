@@ -2,9 +2,9 @@
 
 **Это клиент для [OpenVPN](https://openvpn.net/) на Android — форк проекта [ics-openvpn](https://github.com/schwabe/ics-openvpn) v0.7.64.**
 
-**Оригинальное ядро:** [Arne Schwabe](https://github.com/schwabe)
-**Своя оболочка:** `app` на Kotlin (`com.mropenovpn.client`)
-**Лицензия:** [GNU GPL v3](LICENSE)
+- **Оригинальное ядро:** [Arne Schwabe](https://github.com/schwabe)
+- **Своя оболочка:** `app` на Kotlin (`com.mropenovpn.client`)
+- **Лицензия:** [GNU GPL v3](LICENSE)
 
 Простой Android-клиент, который подключается к OpenVPN-серверу по готовому `.ovpn`-файлу — без лишних настроек и регистраций. Импортировал профиль, нажал **Connect** — работает.
 

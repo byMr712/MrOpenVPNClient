@@ -35,6 +35,11 @@ class SettingsActivity : BaseActivity() {
             startActivity(Intent(this, ExperimentalThemesActivity::class.java))
         }
 
+        val statusAnimEntry = findViewById<View>(R.id.statusAnimEntry)
+        statusAnimEntry.setOnClickListener {
+            startActivity(Intent(this, AppAnimationsActivity::class.java))
+        }
+
         val swDebugMode = findViewById<MaterialSwitch>(R.id.swDebugMode)
         swDebugMode.isChecked = VpnPrefs.debugMode(this)
         swDebugMode.setOnCheckedChangeListener { _, checked ->

@@ -43,6 +43,14 @@
             android:exported="false" />
 
         <activity
+            android:name=".activities.StatusAnimationsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activities.AppAnimationsActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".activities.TileConnectActivity"
             android:exported="false"
             android:theme="@style/Theme.MrOpenVPNClient.NoDisplay" />

@@ -11,7 +11,8 @@ import com.mropenovpn.client.VpnPrefs
 
 class StatusOutlineAnimator(
     private val context: Context,
-    private val card: MaterialCardView
+    private val card: MaterialCardView,
+    private val animIdProvider: (Context) -> String? = { null }
 ) {
 
     enum class State { DISCONNECTED, CONNECTING, CONNECTED }
@@ -28,15 +29,18 @@ class StatusOutlineAnimator(
 
     private val gray = 0xFF808080.toInt()
     private val baseStrokeWidth = (2 * context.resources.displayMetrics.density).toInt()
+    private val idleStrokeWidth = context.resources.displayMetrics.density.toInt()
 
     private var animator: ValueAnimator? = null
 
     fun setState(state: State) {
         stopAnimation()
         when (state) {
-            State.DISCONNECTED -> setStatic(gray)
+            State.DISCONNECTED -> setIdleOutline()
             State.CONNECTED -> setStatic(accentColor())
-            State.CONNECTING -> startAnimation(VpnPrefs.statusOutlineAnim(context))
+            State.CONNECTING -> startAnimation(
+                animIdProvider(context) ?: VpnPrefs.statusOutlineAnim(context)
+            )
         }
     }
 
@@ -49,13 +53,27 @@ class StatusOutlineAnimator(
         card.setStrokeColor(ColorStateList.valueOf(color))
     }
 
+    private fun setIdleOutline() {
+        card.strokeWidth = idleStrokeWidth
+        card.setStrokeColor(ColorStateList.valueOf(outlineVariantColor()))
+    }
+
+    private fun outlineVariantColor(): Int {
+        val ta = context.theme.obtainStyledAttributes(
+            intArrayOf(com.google.android.material.R.attr.colorOutlineVariant)
+        )
+        val color = ta.getColor(0, gray)
+        ta.recycle()
+        return color
+    }
+
     private fun startAnimation(id: String) {
         when (id) {
             ANIM_PULSE -> startPulse()
             ANIM_BLINK -> startBlink()
             ANIM_RAINBOW -> startRainbow()
             ANIM_THROB -> startThrob()
-            else -> setStatic(gray)
+            else -> setIdleOutline()
         }
     }
 
@@ -87,7 +105,7 @@ class StatusOutlineAnimator(
             addUpdateListener { a ->
                 val on = (a.animatedValue as Float) < 0.5f
                 card.setStrokeColor(
-                    ColorStateList.valueOf(if (on) gray else Color.TRANSPARENT)
+                    ColorStateList.valueOf(if (on) accentColor() else Color.TRANSPARENT)
                 )
             }
             start()
@@ -117,7 +135,7 @@ class StatusOutlineAnimator(
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener { a ->
                 card.strokeWidth = a.animatedValue as Int
-                card.setStrokeColor(ColorStateList.valueOf(gray))
+                card.setStrokeColor(ColorStateList.valueOf(accentColor()))
             }
             start()
         }

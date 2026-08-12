@@ -92,7 +92,7 @@
     <string name="settings_show_notification_summary">Show connection status and a Disconnect button</string>
 
     <string name="settings_connection_section">Connection</string>
-    <string name="settings_appearance_section">App theme</string>
+    <string name="settings_appearance_section">Customization</string>
     <string name="settings_debug_section">Debug</string>
     <string name="settings_data_section">Data</string>
     <string name="settings_auto_connect">Auto-connect</string>
@@ -103,8 +103,8 @@
     <string name="settings_net_change_reconnect_summary">Restart the connection when the network is lost</string>
     <string name="settings_debug_mode">Debug mode</string>
     <string name="settings_debug_mode_summary">Show the "Copy log" button</string>
-    <string name="settings_experimental_themes">App theme</string>
-    <string name="settings_experimental_themes_summary">Alternative app designs</string>
+    <string name="settings_experimental_themes">App themes</string>
+    <string name="settings_experimental_themes_summary">Alternative designs</string>
     <string name="clear_users">Delete all users</string>
     <string name="clear_users_confirm">Delete all saved logins and passwords?</string>
     <string name="settings_version">Version: %1$s</string>
@@ -129,4 +129,23 @@
     <string name="accent_title">Accent color</string>
     <string name="accent_hint">Applied immediately, no restart</string>
     <string name="accent_custom_hint">Custom color: HEX (e.g. #1E88E5 or 1E88E5)</string>
+
+    <string name="settings_status_animations">App animations</string>
+    <string name="settings_status_animations_summary">Alternative animations</string>
+    <string name="status_animations_title">Status window animations</string>
+    <string name="profile_animations_title">Selected profile animations</string>
+    <string name="anim_sync_title">Sync all animations with the status window</string>
+    <string name="anim_sync_summary">All animations will match the status window</string>
+    <string name="anim_sync_status_summary">Status window outline animation</string>
+    <string name="anim_sync_profile_summary">Selected profile outline animation</string>
+    <string name="anim_off_name">No animation</string>
+    <string name="anim_off_desc">Outline stays gray while connecting</string>
+    <string name="anim_pulse_name">Pulse</string>
+    <string name="anim_pulse_desc">Outline smoothly pulses in color</string>
+    <string name="anim_blink_name">Blink</string>
+    <string name="anim_blink_desc">Outline blinks</string>
+    <string name="anim_rainbow_name">Rainbow</string>
+    <string name="anim_rainbow_desc">Outline cycles through all colors</string>
+    <string name="anim_throb_name">Throb</string>
+    <string name="anim_throb_desc">Outline throbs in thickness</string>
 </resources>

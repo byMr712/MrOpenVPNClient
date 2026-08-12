@@ -306,6 +306,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
 
     override fun onStop() {
         statusOutlineAnimator.stop()
+        adapter.stopAnimations()
         VpnStatus.removeStateListener(this)
         super.onStop()
     }
@@ -319,7 +320,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
     ) {
         runOnUiThread {
             updateStatusLevel(level)
-            adapter.notifyDataSetChanged()
+            adapter.setLevel(level)
         }
     }
 
@@ -347,6 +348,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             )
         )
         statusOutlineAnimator.setState(outlineStateFor(level))
+        adapter.setLevel(level)
     }
 
     private fun outlineStateFor(level: ConnectionStatus): StatusOutlineAnimator.State =
@@ -666,10 +668,15 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
     }
 
     private fun refreshProfileList() {
-        val profiles = ProfileManager.getInstance(this)
-            .getProfiles()
-            .sortedBy { it.mName }
-        adapter.setProfiles(profiles)
+        val all = ProfileManager.getInstance(this).getProfiles()
+        val byUuid = all.associateBy { it.uuid.toString() }
+        val storedOrder = VpnPrefs.profileOrder(this)
+        val known = storedOrder.filter { byUuid.containsKey(it) }
+        val missing = all.filter { it.uuid.toString() !in storedOrder }
+        if (known.size != storedOrder.size || missing.isNotEmpty()) {
+            VpnPrefs.setProfileOrder(this, known + missing.map { it.uuid.toString() })
+        }
+        adapter.setProfiles(known.mapNotNull { byUuid[it] } + missing)
     }
 
     private fun updateStatusUi() {
@@ -688,6 +695,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             )
         )
         statusOutlineAnimator.setState(outlineStateFor(level))
+        adapter.setLevel(level)
     }
 
     private fun requestNotificationPermissionIfNeeded() {
