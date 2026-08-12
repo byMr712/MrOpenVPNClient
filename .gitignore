@@ -1,0 +1,29 @@
+# Gradle
+.gradle/
+build/
+
+# Local configuration file (sdk path etc.)
+local.properties
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Android studio build outputs
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Logs
+*.log
+
+# APK build outputs
+*.apk
+
+# Local debug log copied from the device
+logs.txt

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MrOpenVPN Client</string>
+    <string name="import_profile">Import .ovpn profile</string>
+    <string name="profiles">Profiles</string>
+    <string name="no_profiles">No profiles yet</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="close">Close</string>
+
+    <string name="status_no_connection_message">Not connected. Import a profile to get started.</string>
+
+    <string name="state_connected">Connected</string>
+    <string name="state_disconnected">Disconnected</string>
+    <string name="state_connecting">Connecting…</string>
+    <string name="state_connecting_server_replied">Connected to server, waiting for final config</string>
+    <string name="state_starting">Starting…</string>
+    <string name="state_auth_failed">Authentication failed</string>
+    <string name="state_waiting_input">Waiting for input</string>
+    <string name="state_no_network">No network</string>
+    <string name="state_paused">Paused</string>
+
+    <string name="import_success">Profile imported: %1$s</string>
+    <string name="import_error">Failed to import profile: %1$s</string>
+    <string name="vpn_permission_denied">VPN permission was not granted.</string>
+    <string name="vpn_start_error">Could not start the VPN.</string>
+    <string name="copy_log">Copy log</string>
+    <string name="log_copied">%1$d log lines copied to clipboard</string>
+    <string name="credentials_title">Enter VPN credentials</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="credentials_required">Username and password are required</string>
+    <string name="new_user">New user</string>
+    <string name="user_select_hint">Select user</string>
+    <string name="remember_user">Remember this user</string>
+
+    <string name="tile_label">MrOpenVPN</string>
+    <string name="tile_connect">Connect VPN</string>
+    <string name="tile_disconnect">Disconnect VPN</string>
+    <string name="tile_no_profiles">No profiles</string>
+    <string name="tile_no_profile_slot">No VPN</string>
+
+    <string name="menu_open">Открыть меню</string>
+    <string name="back">Назад</string>
+    <string name="app_subtitle">VPN-клиент</string>
+    <string name="menu_profiles">Профили</string>
+    <string name="menu_users">Пользователи</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_about">О приложении</string>
+    <string name="about_message">MrOpenVPN Client\nВерсия: %1$s\n\nПростой VPN-клиент для подключения к серверу.</string>
+
+    <string name="add_user">Добавить пользователя</string>
+    <string name="no_users">Пока нет сохранённых пользователей</string>
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_user">Удалить пользователя</string>
+    <string name="delete_user_confirm">Удалить пользователя %1$s?</string>
+    <string name="user_has_password">пароль сохранён</string>
+    <string name="user_added">Пользователь %1$s добавлен</string>
+    <string name="user_deleted">Пользователь %1$s удалён</string>
+    <string name="users_cleared">Все сохранённые пользователи удалены</string>
+
+    <string name="settings_connection_section">Подключение</string>
+    <string name="settings_data_section">Данные</string>
+    <string name="settings_auto_connect">Автоподключение</string>
+    <string name="settings_auto_connect_summary">Подключаться к последнему профилю при запуске приложения</string>
+    <string name="settings_screen_off">Пауза при выключенном экране</string>
+    <string name="settings_screen_off_summary">Приостанавливать VPN, когда экран выключен</string>
+    <string name="settings_ignore_net_state">Игнорировать состояние сети</string>
+    <string name="settings_ignore_net_state_summary">Не реагировать на изменения сети</string>
+    <string name="settings_net_change_reconnect">Переподключаться при смене сети</string>
+    <string name="settings_net_change_reconnect_summary">Перезапускать соединение при потере сети</string>
+    <string name="clear_users">Удалить всех пользователей</string>
+    <string name="clear_users_confirm">Удалить все сохранённые логины и пароли?</string>
+    <string name="settings_version">Версия: %1$s</string>
+</resources>

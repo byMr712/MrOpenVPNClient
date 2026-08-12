@@ -1,0 +1,51 @@
+package com.mropenovpn.client
+
+import android.content.Context
+import android.util.Base64
+
+object VpnUsers {
+    private const val FILE = "vpn_users"
+    private const val KEY_USERS = "users"
+    private const val PW_PREFIX = "pw_"
+
+    private fun prefs(context: Context) =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+
+    private fun key(login: String): String =
+        PW_PREFIX + Base64.encodeToString(
+            login.toByteArray(Charsets.UTF_8),
+            Base64.NO_WRAP or Base64.URL_SAFE
+        )
+
+    fun users(context: Context): List<String> =
+        prefs(context).getStringSet(KEY_USERS, emptySet())
+            ?.sorted()
+            ?: emptyList()
+
+    fun password(context: Context, login: String): String? =
+        prefs(context).getString(key(login), null)
+
+    fun save(context: Context, login: String, password: String) {
+        val p = prefs(context)
+        val set = HashSet(p.getStringSet(KEY_USERS, emptySet()))
+        set.add(login)
+        p.edit()
+            .putStringSet(KEY_USERS, set)
+            .putString(key(login), password)
+            .apply()
+    }
+
+    fun delete(context: Context, login: String) {
+        val p = prefs(context)
+        val set = HashSet(p.getStringSet(KEY_USERS, emptySet()))
+        set.remove(login)
+        p.edit()
+            .putStringSet(KEY_USERS, set)
+            .remove(key(login))
+            .apply()
+    }
+
+    fun clearAll(context: Context) {
+        prefs(context).edit().clear().apply()
+    }
+}
