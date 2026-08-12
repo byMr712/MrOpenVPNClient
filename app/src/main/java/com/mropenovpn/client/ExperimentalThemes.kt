@@ -24,7 +24,8 @@ object ExperimentalThemes {
         val nameRes: Int,
         val descRes: Int,
         val styleRes: Int,
-        val accentHex: String
+        val accentHex: String,
+        val dark: Boolean
     )
 
     data class AccentDef(
@@ -49,35 +50,40 @@ object ExperimentalThemes {
             nameRes = R.string.theme_neon_name,
             descRes = R.string.theme_neon_desc,
             styleRes = R.style.Theme_MrOpenVPNClient_Neon,
-            accentHex = "#00E5FF"
+            accentHex = "#00E5FF",
+            dark = true
         ),
         ThemeDef(
             id = "oled",
             nameRes = R.string.theme_oled_name,
             descRes = R.string.theme_oled_desc,
             styleRes = R.style.Theme_MrOpenVPNClient_Oled,
-            accentHex = "#FFFFFF"
+            accentHex = "#FFFFFF",
+            dark = true
         ),
         ThemeDef(
             id = "paper",
             nameRes = R.string.theme_paper_name,
             descRes = R.string.theme_paper_desc,
             styleRes = R.style.Theme_MrOpenVPNClient_Paper,
-            accentHex = "#22355E"
+            accentHex = "#22355E",
+            dark = false
         ),
         ThemeDef(
             id = "redline",
             nameRes = R.string.theme_redline_name,
             descRes = R.string.theme_redline_desc,
             styleRes = R.style.Theme_MrOpenVPNClient_Redline,
-            accentHex = "#FF453A"
+            accentHex = "#FF453A",
+            dark = true
         ),
         ThemeDef(
             id = "mint",
             nameRes = R.string.theme_mint_name,
             descRes = R.string.theme_mint_desc,
             styleRes = R.style.Theme_MrOpenVPNClient_Mint,
-            accentHex = "#00A67D"
+            accentHex = "#00A67D",
+            dark = false
         )
     )
 

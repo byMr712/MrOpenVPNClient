@@ -8,9 +8,10 @@ import de.blinkt.openvpn.core.VpnStatus
 class MrOpenVpnApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        val dark = ExperimentalThemes.themeFor(this)?.dark ?: !VpnPrefs.isLightTheme(this)
         AppCompatDelegate.setDefaultNightMode(
-            if (VpnPrefs.isLightTheme(this)) AppCompatDelegate.MODE_NIGHT_NO
-            else AppCompatDelegate.MODE_NIGHT_YES
+            if (dark) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
         )
         OpenVPNService.setNotificationVisible(VpnPrefs.notifyEnabled(this))
         VpnStatus.initLogCache(cacheDir)

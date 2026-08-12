@@ -325,7 +325,16 @@ class ExperimentalThemesActivity : BaseActivity() {
                         VpnPrefs.setLightTheme(this, true)
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     }
-                    else -> VpnPrefs.setExperimentalTheme(this, themeId)
+                    else -> {
+                        VpnPrefs.setExperimentalTheme(this, themeId)
+                        AppCompatDelegate.setDefaultNightMode(
+                            if (ExperimentalThemes.themes.firstOrNull { it.id == themeId }?.dark == true) {
+                                AppCompatDelegate.MODE_NIGHT_YES
+                            } else {
+                                AppCompatDelegate.MODE_NIGHT_NO
+                            }
+                        )
+                    }
                 }
                 restartApp()
             }
