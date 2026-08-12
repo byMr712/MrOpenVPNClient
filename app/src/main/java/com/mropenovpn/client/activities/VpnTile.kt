@@ -86,6 +86,7 @@ abstract class VpnTileBase(private val slot: Int) : TileService(), VpnStatus.Sta
         val profile = VpnTileManager.profileForSlot(this, slot)
         tile.icon = Icon.createWithResource(this, R.drawable.ic_tile_mr)
         tile.label = getString(R.string.tile_label)
+        tile.subtitle = null
         if (profile == null) {
             tile.state = Tile.STATE_UNAVAILABLE
         } else {
