@@ -64,7 +64,7 @@
     </style>
 
     <style name="Theme.MrOpenVPNClient.Oled" parent="Theme.MrOpenVPNClient">
-        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorPrimary">#33FF33</item>
         <item name="colorOnPrimary">#000000</item>
         <item name="colorPrimaryContainer">#2A2A2A</item>
         <item name="colorOnPrimaryContainer">#FFFFFF</item>

@@ -159,7 +159,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         when (themeId) {
             "neon" -> {
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes(0f)
+                    .setAllCornerSizes(16 * density)
                     .build()
             }
             "oled" -> {

@@ -109,8 +109,8 @@
     <string name="theme_default_white_desc">Standard light theme, no effects</string>
     <string name="theme_neon_name">Neon Grid</string>
     <string name="theme_neon_desc">Pure black, cyan and magenta, sharp lines, wide connect bar</string>
-    <string name="theme_oled_name">OLED</string>
-    <string name="theme_oled_desc">Monochrome black and white, outlined connect button</string>
+    <string name="theme_oled_name">Lime Amoled</string>
+    <string name="theme_oled_desc">Pure black with neon lime accent, outlined connect button</string>
     <string name="theme_paper_name">Paper Desk</string>
     <string name="theme_paper_desc">Warm ivory and deep navy, soft rounded shapes</string>
     <string name="theme_redline_name">Red Line</string>

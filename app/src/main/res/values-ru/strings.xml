@@ -109,8 +109,8 @@
     <string name="theme_default_white_desc">Обычная светлая тема, без эффектов</string>
     <string name="theme_neon_name">Неоновая сетка</string>
     <string name="theme_neon_desc">Киберпанк: чистый чёрный, циан и пурпур, острые линии, широкая кнопка</string>
-    <string name="theme_oled_name">OLED</string>
-    <string name="theme_oled_desc">Монохромный чёрный и белый, контурная кнопка подключения</string>
+    <string name="theme_oled_name">Лаймовый Amoled</string>
+    <string name="theme_oled_desc">Чистый чёрный с неоново-лаймовым акцентом, контурная кнопка подключения</string>
     <string name="theme_paper_name">Бумажный стол</string>
     <string name="theme_paper_desc">Тёплый кремовый и тёмно-синий, мягкие скругления</string>
     <string name="theme_redline_name">Красная линия</string>

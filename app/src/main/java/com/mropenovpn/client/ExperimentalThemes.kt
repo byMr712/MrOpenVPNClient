@@ -2,8 +2,10 @@ package com.mropenovpn.client
 
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -15,7 +17,9 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.shape.MaterialShapeDrawable
 
 object ExperimentalThemes {
 
@@ -42,7 +46,8 @@ object ExperimentalThemes {
         AccentDef("#00897B", R.style.AppThemeOverlay_Accent_Teal)
     )
 
-    const val defaultAccentHex = "#1976D2"
+    const val defaultBlackAccentHex = "#FFFFFF"
+    const val defaultWhiteAccentHex = "#000000"
 
     val themes = listOf(
         ThemeDef(
@@ -58,7 +63,7 @@ object ExperimentalThemes {
             nameRes = R.string.theme_oled_name,
             descRes = R.string.theme_oled_desc,
             styleRes = R.style.Theme_MrOpenVPNClient_Oled,
-            accentHex = "#FFFFFF",
+            accentHex = "#33FF33",
             dark = true
         ),
         ThemeDef(
@@ -133,7 +138,33 @@ object ExperimentalThemes {
         val hex = VpnPrefs.accentColor(dialog.context)
         if (hex.isEmpty()) return
         val accent = parseColor(hex) ?: return
-        dialog.window?.decorView?.let { tintViewTree(it, accent) }
+        val window = dialog.window ?: return
+        tintViewTree(window.decorView, accent)
+
+        val density = dialog.context.resources.displayMetrics.density
+        val ta = dialog.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.colorBackground))
+        val bgColor = ta.getColor(0, Color.BLACK)
+        ta.recycle()
+
+        val shape = GradientDrawable().apply {
+            setColor(bgColor)
+            cornerRadius = 16 * density
+            setStroke((1.5 * density).toInt(), accent)
+        }
+        window.setBackgroundDrawable(shape)
+
+        (dialog as? android.app.AlertDialog)?.let { alert ->
+            intArrayOf(
+                DialogInterface.BUTTON_POSITIVE,
+                DialogInterface.BUTTON_NEGATIVE,
+                DialogInterface.BUTTON_NEUTRAL
+            ).forEach { which ->
+                alert.getButton(which)?.let { button ->
+                    button.backgroundTintList = null
+                    button.setTextColor(accent)
+                }
+            }
+        }
     }
 
     private fun tintViewTree(root: View, accent: Int) {
@@ -195,6 +226,12 @@ object ExperimentalThemes {
                     intArrayOf(accent, onSurface)
                 )
                 view is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
+                view is MaterialButton -> {
+                    val shapeBg = view.background as? MaterialShapeDrawable
+                    val isFilled = shapeBg?.fillColor?.defaultColor?.let { Color.alpha(it) > 0 } != false
+                    view.backgroundTintList = ColorStateList.valueOf(accent)
+                    view.setTextColor(if (isFilled) onAccent else accent)
+                }
                 view is EditText -> view.backgroundTintList = ColorStateList.valueOf(accent)
                 view is TextView -> if (view.currentTextColor == primary) {
                     view.setTextColor(accent)
