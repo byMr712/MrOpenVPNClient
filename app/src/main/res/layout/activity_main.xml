@@ -26,15 +26,6 @@
                 android:contentDescription="@string/menu_open"
                 android:padding="12dp"
                 android:src="@drawable/ic_menu_green" />
-
-            <TextView
-                android:id="@+id/appTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/app_name"
-                android:textAppearance="?attr/textAppearanceHeadlineMedium" />
         </LinearLayout>
 
         <ScrollView
@@ -123,6 +114,8 @@
             android:fitsSystemWindows="true"
             app:dividerInsetEnd="16dp"
             app:dividerInsetStart="16dp"
+            app:itemIconTint="@color/nav_item_tint"
+            app:itemTextColor="@color/nav_item_tint"
             app:menu="@menu/drawer_menu" />
 
         <View
@@ -156,13 +149,6 @@
                 android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:textColor="?attr/colorOnSurface" />
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="?attr/colorOutlineVariant" />
 
         <LinearLayout
             android:id="@+id/aboutEntry"

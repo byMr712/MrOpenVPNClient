@@ -3,9 +3,13 @@ package com.mropenovpn.client.activities
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -16,6 +20,7 @@ import com.mropenovpn.client.BaseActivity
 import com.mropenovpn.client.ExperimentalThemes
 import com.mropenovpn.client.R
 import com.mropenovpn.client.VpnPrefs
+import java.util.Locale
 
 class ExperimentalThemesActivity : BaseActivity() {
 
@@ -41,6 +46,12 @@ class ExperimentalThemesActivity : BaseActivity() {
 
         container.addView(buildAccentSection())
     }
+
+    private data class Swatch(
+        val hex: String,
+        val frame: FrameLayout,
+        val circle: android.graphics.drawable.GradientDrawable
+    )
 
     private fun buildAccentSection(): View {
         val density = resources.displayMetrics.density
@@ -70,29 +81,135 @@ class ExperimentalThemesActivity : BaseActivity() {
         val swatches = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
         }
-        swatches.addView(buildSwatch("", currentHex) {
-            if (currentHex != "") {
-                VpnPrefs.setAccentColor(this@ExperimentalThemesActivity, "")
-                recreate()
-            }
-        })
-        ExperimentalThemes.accents.forEach { accent ->
-            swatches.addView(buildSwatch(accent.hex, currentHex) {
-                if (currentHex != accent.hex) {
-                    VpnPrefs.setAccentColor(this@ExperimentalThemesActivity, accent.hex)
-                    recreate()
+        val swatchList = mutableListOf<Swatch>()
+        var previewSwatch: Swatch? = null
+
+        fun addPresetSwatch(hex: String) {
+            val sw = buildSwatch(hex, currentHex) {
+                if (VpnPrefs.accentColor(this@ExperimentalThemesActivity) != hex) {
+                    VpnPrefs.setAccentColor(this@ExperimentalThemesActivity, hex)
+                    ExperimentalThemes.applyAccentOverlay(this@ExperimentalThemesActivity, hex)
+                    refreshSwatches(swatchList)
+                    previewSwatch?.let { updatePreview(it, hex) }
                 }
-            })
+            }
+            swatchList.add(sw)
+            swatches.addView(sw.frame)
+        }
+
+        addPresetSwatch("")
+        ExperimentalThemes.accents.forEach { accent ->
+            addPresetSwatch(accent.hex)
         }
         section.addView(swatches)
+
+        val hexRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = (12 * density).toInt()
+            }
+        }
+
+        val input = EditText(this).apply {
+            hint = getString(R.string.accent_custom_hint)
+            setSingleLine(true)
+            inputType = InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS or
+                InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+            setText(currentHex)
+            setTextColor(themeColor())
+            setHintTextColor(0x66000000.toInt())
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                1f
+            )
+        }
+
+        val preview = buildSwatch(currentHex, currentHex) {}
+        preview.frame.isClickable = false
+        preview.frame.isFocusable = false
+
+        hexRow.addView(input)
+        hexRow.addView(preview.frame)
+        section.addView(hexRow)
+
+        input.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (s.isNullOrBlank()) {
+                    if (VpnPrefs.accentColor(this@ExperimentalThemesActivity).isNotEmpty()) {
+                        VpnPrefs.setAccentColor(this@ExperimentalThemesActivity, "")
+                        recreate()
+                    }
+                    return
+                }
+                val normalized = normalizeHex(s.toString())
+                if (normalized != null &&
+                    normalized != VpnPrefs.accentColor(this@ExperimentalThemesActivity)
+                ) {
+                    VpnPrefs.setAccentColor(this@ExperimentalThemesActivity, normalized)
+                    ExperimentalThemes.applyAccentOverlay(this@ExperimentalThemesActivity, normalized)
+                    refreshSwatches(swatchList)
+                    updatePreview(preview, normalized)
+                }
+            }
+        })
+
         return section
+    }
+
+    private fun normalizeHex(raw: String): String? {
+        var s = raw.trim()
+        if (s.startsWith("#")) s = s.substring(1)
+        if (!s.matches(Regex("[0-9a-fA-F]{3}|[0-9a-fA-F]{6}"))) return null
+        if (s.length == 3) s = s.map { "$it$it" }.joinToString("")
+        return "#" + s.uppercase(Locale.US)
+    }
+
+    private fun refreshSwatches(swatchList: List<Swatch>) {
+        val current = VpnPrefs.accentColor(this)
+        val density = resources.displayMetrics.density
+        swatchList.forEach { sw ->
+            val selected = sw.hex == current
+            sw.circle.setStroke(
+                (if (selected) 3 else 1) * density.toInt(),
+                if (selected) themeColor() else 0x33000000.toInt()
+            )
+            sw.frame.removeAllViews()
+            if (selected) sw.frame.addView(buildCheck(sw.hex))
+        }
+    }
+
+    private fun updatePreview(sw: Swatch, hex: String) {
+        val density = resources.displayMetrics.density
+        sw.circle.setColor(if (hex.isEmpty()) Color.TRANSPARENT else Color.parseColor(hex))
+        sw.circle.setStroke((3 * density).toInt(), themeColor())
+        sw.frame.removeAllViews()
+        sw.frame.addView(buildCheck(if (hex.isEmpty()) "" else hex))
+    }
+
+    private fun buildCheck(hex: String): TextView = TextView(this).apply {
+        text = if (hex.isEmpty()) "–" else "✓"
+        gravity = Gravity.CENTER
+        setTextColor(contrastColor(hex))
+        textSize = 18f
+        layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
     }
 
     private fun buildSwatch(
         hex: String,
         currentHex: String,
         onClick: () -> Unit
-    ): View {
+    ): Swatch {
         val density = resources.displayMetrics.density
         val size = (44 * density).toInt()
         val selected = hex == currentHex
@@ -121,18 +238,9 @@ class ExperimentalThemesActivity : BaseActivity() {
         }
 
         if (selected) {
-            frame.addView(TextView(this).apply {
-                text = if (hex.isEmpty()) "–" else "✓"
-                gravity = Gravity.CENTER
-                setTextColor(contrastColor(hex))
-                textSize = 18f
-                layoutParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            })
+            frame.addView(buildCheck(hex))
         }
-        return frame
+        return Swatch(hex, frame, circle)
     }
 
     private fun themeColor(): Int {

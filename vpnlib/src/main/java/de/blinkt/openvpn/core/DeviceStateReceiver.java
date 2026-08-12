@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -79,6 +80,83 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
 
     private final LinkedList<Datapoint> trafficdata = new LinkedList<>();
 
+    private ConnectivityManager mConnMan;
+    private ConnectivityManager.NetworkCallback mNetworkCallback;
+    private boolean mNetworkCallbackRegistered = false;
+    private Network mLastPhysicalNetwork;
+    private Context mContext;
+
+    /**
+     * Registers a NetworkCallback that reliably detects changes of the
+     * underlying (non-VPN) network. The legacy CONNECTIVITY_ACTION broadcast
+     * is no longer delivered reliably on modern Android versions, so without
+     * this the "Reconnect on network change" / "Ignore network state"
+     * settings would never react to a network change.
+     */
+    public void startNetworkMonitoring(Context context) {
+        mContext = context;
+        mConnMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (mConnMan == null || mNetworkCallbackRegistered)
+            return;
+
+        try {
+            NetworkRequest request = new NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .build();
+            mNetworkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    trackPhysicalNetwork(network);
+                    networkStateChange(mContext);
+                }
+
+                @Override
+                public void onLost(Network network) {
+                    if (network.equals(mLastPhysicalNetwork))
+                        mLastPhysicalNetwork = null;
+                    networkStateChange(mContext);
+                }
+
+                @Override
+                public void onUnavailable() {
+                    mLastPhysicalNetwork = null;
+                    networkStateChange(mContext);
+                }
+
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
+                    trackPhysicalNetwork(network);
+                    networkStateChange(mContext);
+                }
+            };
+            mConnMan.registerNetworkCallback(request, mNetworkCallback);
+            mNetworkCallbackRegistered = true;
+        } catch (Exception e) {
+            VpnStatus.logException(e);
+        }
+    }
+
+    public void stopNetworkMonitoring() {
+        if (mNetworkCallbackRegistered && mConnMan != null) {
+            try {
+                mConnMan.unregisterNetworkCallback(mNetworkCallback);
+            } catch (Exception ignored) {
+            }
+        }
+        mNetworkCallbackRegistered = false;
+        mNetworkCallback = null;
+    }
+
+    private void trackPhysicalNetwork(Network network) {
+        if (mConnMan == null)
+            return;
+        NetworkCapabilities caps = mConnMan.getNetworkCapabilities(network);
+        if (caps != null
+                && !caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                && isUsableNetwork(network, caps))
+            mLastPhysicalNetwork = network;
+    }
+
 
     @Override
     public void updateByteCount(long in, long out, long diffIn, long diffOut) {
@@ -144,10 +222,9 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
                 if (ProfileManager.getLastConnectedVpn() != null && !ProfileManager.getLastConnectedVpn().mPersistTun)
                     VpnStatus.logError(R.string.screen_nopersistenttun);
 
-                screen = connectState.PENDINGDISCONNECT;
-                fillTrafficData();
-                if (network == connectState.DISCONNECTED || userpause == connectState.DISCONNECTED)
-                    screen = connectState.DISCONNECTED;
+                screen = connectState.DISCONNECTED;
+                VpnStatus.logInfo(R.string.screenoff_pause);
+                mManagement.pause(getPauseReason());
             }
         } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
             // Network was disabled because screen off
@@ -178,15 +255,17 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
             return;
         }
 
-        ConnectivityManager conn = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network activeNetwork = conn.getActiveNetwork();
-        NetworkCapabilities caps = activeNetwork == null ? null : conn.getNetworkCapabilities(activeNetwork);
-        boolean usableNetwork = isUsableNetwork(activeNetwork, caps);
+        if (mConnMan == null)
+            mConnMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        Network physicalNetwork = getActivePhysicalNetwork();
+        NetworkCapabilities caps = physicalNetwork == null ? null : mConnMan.getNetworkCapabilities(physicalNetwork);
+        boolean usableNetwork = isUsableNetwork(physicalNetwork, caps);
 
         String netstatestring;
         if (usableNetwork) {
             String transport = transportsToString(caps);
-            netstatestring = String.format("%2$s %3$s to %1$s", transport, "CONNECTED", activeNetwork);
+            netstatestring = String.format("%2$s %3$s to %1$s", transport, "CONNECTED", physicalNetwork);
         } else {
             netstatestring = "not connected";
         }
@@ -194,22 +273,13 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
         boolean sendusr1 = prefs.getBoolean("netchangereconnect", true);
 
         if (usableNetwork) {
-            long newnet = activeNetwork.getNetworkHandle();
+            long newnet = physicalNetwork.getNetworkHandle();
             boolean pendingDisconnect = (network == connectState.PENDINGDISCONNECT);
             network = connectState.SHOULDBECONNECTED;
 
             boolean sameNetwork = (lastConnectedNetwork != 0 && lastConnectedNetwork == newnet);
 
-            boolean vpnNetwork = caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN);
-
-            if (vpnNetwork) {
-                /* The active network is our own VPN tunnel, which is a direct result
-                 * of establishing the VPN connection and not a physical network
-                 * change. Reacting to it would hard-restart OpenVPN right after
-                 * connecting. Keep the underlying network in mind and ignore this
-                 * event. */
-                VpnStatus.logDebug("Ignoring network change for our own VPN network " + newnet);
-            } else if (pendingDisconnect && sameNetwork) {
+            if (pendingDisconnect && sameNetwork) {
                 /* Same network, connection still 'established' */
                 mDisconnectHandler.removeCallbacks(mDelayDisconnectRunnable);
                 // Reprotect the sockets just be sure
@@ -230,8 +300,7 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
                 }
             }
 
-            if (!vpnNetwork)
-                lastConnectedNetwork = newnet;
+            lastConnectedNetwork = newnet;
         } else {
             // Not connected, stop openvpn, set last connected network to no network
             lastConnectedNetwork = 0;
@@ -248,6 +317,27 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
                 netstatestring, getPauseReason(), shouldBeConnected(), network));
         lastStateMsg = netstatestring;
 
+    }
+
+    /**
+     * Returns the current physical (non-VPN) network when it is usable. While
+     * the VPN is running, getActiveNetwork() returns our own VPN tunnel, which
+     * would otherwise make every network change look like the VPN network
+     * itself and would be ignored. On such a network we fall back to the last
+     * physical network tracked by the NetworkCallback instead.
+     */
+    private Network getActivePhysicalNetwork() {
+        if (mConnMan == null)
+            return null;
+
+        Network active = mConnMan.getActiveNetwork();
+        if (active == null)
+            return mLastPhysicalNetwork;
+
+        NetworkCapabilities caps = mConnMan.getNetworkCapabilities(active);
+        if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN))
+            return mLastPhysicalNetwork;
+        return active;
     }
 
 

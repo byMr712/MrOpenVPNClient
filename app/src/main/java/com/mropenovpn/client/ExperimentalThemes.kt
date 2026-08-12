@@ -1,6 +1,16 @@
 package com.mropenovpn.client
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.RadioButton
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
 object ExperimentalThemes {
 
@@ -76,5 +86,44 @@ object ExperimentalThemes {
     fun applyAccent(context: Context) {
         val styleRes = accentStyleFor(context)
         if (styleRes != 0) context.theme.applyStyle(styleRes, true)
+    }
+
+    fun parseColor(hex: String): Int? = try {
+        Color.parseColor(hex)
+    } catch (e: Exception) {
+        null
+    }
+
+    fun accentOrDefaultColor(context: Context, fallback: Int): Int {
+        val hex = VpnPrefs.accentColor(context)
+        if (hex.isEmpty()) return fallback
+        return parseColor(hex) ?: fallback
+    }
+
+    fun applyAccentOverlay(activity: AppCompatActivity, hex: String) {
+        val accent = parseColor(hex) ?: return
+        val root = activity.window.decorView
+
+        val ta = activity.theme.obtainStyledAttributes(
+            intArrayOf(com.google.android.material.R.attr.colorPrimary)
+        )
+        val primary = ta.getColor(0, Color.BLACK)
+        ta.recycle()
+
+        fun tint(view: View) {
+            when (view) {
+                is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
+                is TextView -> if (view !is Button && view.currentTextColor == primary) {
+                    view.setTextColor(accent)
+                }
+                is CheckBox -> view.buttonTintList = ColorStateList.valueOf(accent)
+                is RadioButton -> view.buttonTintList = ColorStateList.valueOf(accent)
+                is ImageView -> view.imageTintList = ColorStateList.valueOf(accent)
+            }
+            if (view is ViewGroup) {
+                for (i in 0 until view.childCount) tint(view.getChildAt(i))
+            }
+        }
+        tint(root)
     }
 }

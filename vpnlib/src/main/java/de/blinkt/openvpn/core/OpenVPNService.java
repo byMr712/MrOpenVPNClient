@@ -106,7 +106,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     private static boolean mNotificationAlwaysVisible = false;
     private static Class<? extends Activity> mNotificationActivityClass;
     private static boolean mShowNotification = true;
+    private static volatile OpenVPNService sInstance = null;
     private boolean mForegroundStarted = false;
+    private ConnectionStatus mLastNotificationLevel = ConnectionStatus.LEVEL_START;
+    private Intent mLastNotificationIntent = null;
 
 
     static class TunConfig {
@@ -225,6 +228,30 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
     public static void setNotificationVisible(boolean visible) {
         mShowNotification = visible;
+        OpenVPNService service = sInstance;
+        if (service != null) {
+            service.applyNotificationVisibility();
+        }
+    }
+
+    private void applyNotificationVisibility() {
+        if (mProcessThread == null)
+            return;
+
+        String msg = VpnStatus.getLastCleanLogMessage(this);
+        if (mShowNotification) {
+            String channel = (mLastNotificationLevel == ConnectionStatus.LEVEL_CONNECTED)
+                    ? NOTIFICATION_CHANNEL_BG_ID
+                    : NOTIFICATION_CHANNEL_NEWSTATUS_ID;
+            showNotification(msg, null, channel, mConnecttime, mLastNotificationLevel, mLastNotificationIntent);
+        } else {
+            showNotification(msg, null, NOTIFICATION_CHANNEL_NEWSTATUS_ID, 0,
+                    mLastNotificationLevel, mLastNotificationIntent);
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.cancel(NOTIFICATION_CHANNEL_BG_ID.hashCode());
+            nm.cancel(NOTIFICATION_CHANNEL_ERROR_ID.hashCode());
+            nm.cancel(NOTIFICATION_CHANNEL_USERREQ_ID.hashCode());
+        }
     }
 
     PendingIntent getContentIntent() {
@@ -542,11 +569,13 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         registerReceiver(newDeviceStateReceiver, filter);
         VpnStatus.addByteCountListener(newDeviceStateReceiver);
+        newDeviceStateReceiver.startNetworkMonitoring(this);
     }
 
     synchronized void unregisterDeviceStateReceiver(DeviceStateReceiver deviceStateReceiver) {
         if (mDeviceStateReceiver != null)
             try {
+                deviceStateReceiver.stopNetworkMonitoring();
                 VpnStatus.removeByteCountListener(deviceStateReceiver);
                 this.unregisterReceiver(deviceStateReceiver);
             } catch (IllegalArgumentException iae) {
@@ -875,6 +904,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     @Override
     public void onCreate() {
         super.onCreate();
+        sInstance = this;
         guiHandler = new Handler(getMainLooper());
         mCommandHandlerThread = new HandlerThread("OpenVPNServiceCommandThread");
         mCommandHandlerThread.start();
@@ -883,6 +913,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
     @Override
     public void onDestroy() {
+        if (sInstance == this)
+            sInstance = null;
         synchronized (mProcessLock) {
             if (mProcessThread != null) {
                 mManagement.stopVPN(true);
@@ -1444,6 +1476,9 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         doSendBroadcast(state, level);
         if (mProcessThread == null && !mNotificationAlwaysVisible)
             return;
+
+        mLastNotificationLevel = level;
+        mLastNotificationIntent = intent;
 
         String channel = NOTIFICATION_CHANNEL_NEWSTATUS_ID;
         // Display byte count only after being connected

@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -85,7 +86,8 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
 
         adapter = ProfileAdapter(
             onConnect = ::connectToProfile,
-            onDisconnect = ::disconnectCurrent
+            onDisconnect = ::disconnectCurrent,
+            onSelectUser = ::showUserPicker
         )
         profileList.layoutManager = LinearLayoutManager(this)
         profileList.adapter = adapter
@@ -99,6 +101,23 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         }
 
         applyExperimentalTheme()
+
+        findViewById<View>(R.id.statusCard).setOnClickListener {
+            if (VpnStatus.isVPNActive()) {
+                disconnectCurrent()
+            } else {
+                val profile = VpnPrefs.lastProfileUuid(this)?.let { uuid ->
+                    ProfileManager.getInstance(this)
+                        .getProfiles()
+                        .firstOrNull { it.uuid.toString() == uuid }
+                }
+                if (profile != null) {
+                    connectToProfile(profile)
+                } else {
+                    Toast.makeText(this, R.string.no_profiles, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
         OpenVPNService.setNotificationActivityClass(MainActivity::class.java)
 
@@ -294,7 +313,14 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             else -> getString(R.string.state_disconnected)
         }
         statusLevelText.setTextColor(
-            themeColor(if (error) com.google.android.material.R.attr.colorError else com.google.android.material.R.attr.colorPrimary)
+            if (error) {
+                themeColor(com.google.android.material.R.attr.colorError)
+            } else {
+                ExperimentalThemes.accentOrDefaultColor(
+                    this,
+                    themeColor(com.google.android.material.R.attr.colorPrimary)
+                )
+            }
         )
     }
 
@@ -343,6 +369,76 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 Toast.LENGTH_LONG
             ).show()
         }
+    }
+
+    private fun showUserPicker(profile: VpnProfile) {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_user_picker, null)
+        val list = view.findViewById<LinearLayout>(R.id.userPickerList)
+        val users = VpnUsers.users(this)
+        val current = profile.mUsername
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.select_user)
+            .setView(view)
+            .setNegativeButton(R.string.close, null)
+            .create()
+
+        if (users.isEmpty()) {
+            list.addView(
+                TextView(this).apply {
+                    setText(R.string.no_users)
+                    setPadding(16, 8, 16, 16)
+                    setTextAppearance(this@MainActivity, com.google.android.material.R.style.TextAppearance_Material3_BodySmall)
+                }
+            )
+        } else {
+            users.sortedBy { it != current }.forEach { login ->
+                list.addView(
+                    com.google.android.material.radiobutton.MaterialRadioButton(this).apply {
+                        text = login
+                        isChecked = login == current
+                        setOnClickListener {
+                            selectUserForProfile(profile, login)
+                            dialog.dismiss()
+                        }
+                    }
+                )
+            }
+        }
+
+        view.findViewById<Button>(R.id.pickAddUserButton).setOnClickListener {
+            showAddUserAndSelect(profile) { dialog.dismiss() }
+        }
+        dialog.show()
+    }
+
+    private fun selectUserForProfile(profile: VpnProfile, login: String) {
+        profile.mUsername = login
+        profile.mPassword = VpnUsers.password(this, login) ?: ""
+        ProfileManager.saveProfile(this, profile)
+        VpnStatus.logInfo(R.string.user_selected, login)
+        refreshProfileList()
+    }
+
+    private fun showAddUserAndSelect(profile: VpnProfile, onDone: () -> Unit) {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_add_user, null)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.add_user)
+            .setView(view)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val username = view.findViewById<EditText>(R.id.newUsername).text.toString().trim()
+                val password = view.findViewById<EditText>(R.id.newPassword).text.toString()
+                if (username.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(this, R.string.credentials_required, Toast.LENGTH_LONG).show()
+                } else {
+                    VpnUsers.save(this, username, password)
+                    VpnStatus.logInfo(R.string.user_added, username)
+                    selectUserForProfile(profile, username)
+                    onDone()
+                }
+            }
+            .setNegativeButton(R.string.close, null)
+            .show()
     }
 
     private fun showCredentialsDialog(profile: VpnProfile) {
@@ -442,7 +538,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 parser.parseConfig(BufferedReader(InputStreamReader(it)))
             }
             val profile = parser.convertProfile()
-            profile.mName = uniqueName(profile.mName.ifBlank { "MrOpenVPN Profile" })
+            profile.mName = uniqueName(profile.mName.ifBlank { nextNumberedName() })
 
             val pm = ProfileManager.getInstance(this)
             pm.addProfile(profile)
@@ -479,6 +575,16 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         return "$base ($i)"
     }
 
+    private fun nextNumberedName(): String {
+        val names = ProfileManager.getInstance(this)
+            .getProfiles()
+            .map { it.mName }
+            .toMutableSet()
+        var i = 1
+        while ("$i" in names) i++
+        return i.toString()
+    }
+
     private fun refreshProfileList() {
         val profiles = ProfileManager.getInstance(this)
             .getProfiles()
@@ -491,7 +597,12 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         statusLevelText.text = getString(
             if (active) R.string.state_connected else R.string.state_disconnected
         )
-        statusLevelText.setTextColor(themeColor(com.google.android.material.R.attr.colorPrimary))
+        statusLevelText.setTextColor(
+            ExperimentalThemes.accentOrDefaultColor(
+                this,
+                themeColor(com.google.android.material.R.attr.colorPrimary)
+            )
+        )
     }
 
     private fun requestNotificationPermissionIfNeeded() {

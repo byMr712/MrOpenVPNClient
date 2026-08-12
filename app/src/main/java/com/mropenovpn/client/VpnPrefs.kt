@@ -61,10 +61,13 @@ object VpnPrefs {
             ?: ""
 
     fun setAccentColor(context: Context, hex: String) {
+        // commit() is required here: clearing the accent while disabling an
+        // experimental theme is followed by restartApp(), and an async
+        // apply() would be lost when the process is killed.
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_ACCENT, hex)
-            .apply()
+            .commit()
     }
 
     fun debugMode(context: Context): Boolean =

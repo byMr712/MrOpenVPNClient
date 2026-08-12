@@ -36,6 +36,7 @@
         <item name="colorOnSecondary">#3E0021</item>
         <item name="colorSecondaryContainer">#FFD9E8</item>
         <item name="colorOnSecondaryContainer">#3E0021</item>
+        <item name="colorOnSurfaceVariant">#B7C8CE</item>
         <item name="android:colorBackground">#06070A</item>
         <item name="colorSurface">#06070A</item>
         <item name="colorOnSurface">#E4EDF0</item>
@@ -63,6 +64,9 @@
         <item name="colorOnPrimaryContainer">#FFFFFF</item>
         <item name="colorSecondary">#9E9E9E</item>
         <item name="colorOnSecondary">#000000</item>
+        <item name="colorSecondaryContainer">#2A2A2A</item>
+        <item name="colorOnSecondaryContainer">#FFFFFF</item>
+        <item name="colorOnSurfaceVariant">#9E9E9E</item>
         <item name="android:colorBackground">#000000</item>
         <item name="colorSurface">#000000</item>
         <item name="colorOnSurface">#FFFFFF</item>
@@ -92,6 +96,7 @@
         <item name="colorOnSecondary">#FFFFFF</item>
         <item name="colorSecondaryContainer">#E9DFC4</item>
         <item name="colorOnSecondaryContainer">#241A06</item>
+        <item name="colorOnSurfaceVariant">#5C5849</item>
         <item name="android:colorBackground">#F5F0E6</item>
         <item name="colorSurface">#F5F0E6</item>
         <item name="colorOnSurface">#211F1A</item>
@@ -121,6 +126,7 @@
         <item name="colorOnSecondary">#3F2F00</item>
         <item name="colorSecondaryContainer">#FFE08A</item>
         <item name="colorOnSecondaryContainer">#3F2F00</item>
+        <item name="colorOnSurfaceVariant">#C0ABAA</item>
         <item name="android:colorBackground">#12090A</item>
         <item name="colorSurface">#12090A</item>
         <item name="colorOnSurface">#F2E2E0</item>
@@ -150,6 +156,7 @@
         <item name="colorOnSecondary">#FFFFFF</item>
         <item name="colorSecondaryContainer">#D4E9EC</item>
         <item name="colorOnSecondaryContainer">#0A1F22</item>
+        <item name="colorOnSurfaceVariant">#4C5552</item>
         <item name="android:colorBackground">#F7FBF9</item>
         <item name="colorSurface">#F7FBF9</item>
         <item name="colorOnSurface">#171D1C</item>
@@ -284,6 +291,10 @@
         <item name="colorPrimaryContainer">@color/accent_blue_container</item>
         <item name="colorOnPrimaryContainer">@color/accent_blue_on_container</item>
         <item name="android:colorAccent">@color/accent_blue</item>
+        <item name="colorSecondary">@color/accent_blue</item>
+        <item name="colorOnSecondary">@color/accent_blue_on</item>
+        <item name="colorSecondaryContainer">@color/accent_blue_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_blue_on_container</item>
     </style>
 
     <style name="AppThemeOverlay.Accent.Green" parent="">
@@ -292,6 +303,10 @@
         <item name="colorPrimaryContainer">@color/accent_green_container</item>
         <item name="colorOnPrimaryContainer">@color/accent_green_on_container</item>
         <item name="android:colorAccent">@color/accent_green</item>
+        <item name="colorSecondary">@color/accent_green</item>
+        <item name="colorOnSecondary">@color/accent_green_on</item>
+        <item name="colorSecondaryContainer">@color/accent_green_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_green_on_container</item>
     </style>
 
     <style name="AppThemeOverlay.Accent.Orange" parent="">
@@ -300,6 +315,10 @@
         <item name="colorPrimaryContainer">@color/accent_orange_container</item>
         <item name="colorOnPrimaryContainer">@color/accent_orange_on_container</item>
         <item name="android:colorAccent">@color/accent_orange</item>
+        <item name="colorSecondary">@color/accent_orange</item>
+        <item name="colorOnSecondary">@color/accent_orange_on</item>
+        <item name="colorSecondaryContainer">@color/accent_orange_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_orange_on_container</item>
     </style>
 
     <style name="AppThemeOverlay.Accent.Purple" parent="">
@@ -308,6 +327,10 @@
         <item name="colorPrimaryContainer">@color/accent_purple_container</item>
         <item name="colorOnPrimaryContainer">@color/accent_purple_on_container</item>
         <item name="android:colorAccent">@color/accent_purple</item>
+        <item name="colorSecondary">@color/accent_purple</item>
+        <item name="colorOnSecondary">@color/accent_purple_on</item>
+        <item name="colorSecondaryContainer">@color/accent_purple_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_purple_on_container</item>
     </style>
 
     <style name="AppThemeOverlay.Accent.Pink" parent="">
@@ -316,6 +339,10 @@
         <item name="colorPrimaryContainer">@color/accent_pink_container</item>
         <item name="colorOnPrimaryContainer">@color/accent_pink_on_container</item>
         <item name="android:colorAccent">@color/accent_pink</item>
+        <item name="colorSecondary">@color/accent_pink</item>
+        <item name="colorOnSecondary">@color/accent_pink_on</item>
+        <item name="colorSecondaryContainer">@color/accent_pink_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_pink_on_container</item>
     </style>
 
     <style name="AppThemeOverlay.Accent.Teal" parent="">
@@ -324,5 +351,9 @@
         <item name="colorPrimaryContainer">@color/accent_teal_container</item>
         <item name="colorOnPrimaryContainer">@color/accent_teal_on_container</item>
         <item name="android:colorAccent">@color/accent_teal</item>
+        <item name="colorSecondary">@color/accent_teal</item>
+        <item name="colorOnSecondary">@color/accent_teal_on</item>
+        <item name="colorSecondaryContainer">@color/accent_teal_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_teal_on_container</item>
     </style>
 </resources>

@@ -97,6 +97,3 @@ abstract class VpnTileBase(private val slot: Int) : TileService(), VpnStatus.Sta
 }
 
 class VpnTile0 : VpnTileBase(0)
-class VpnTile1 : VpnTileBase(1)
-class VpnTile2 : VpnTileBase(2)
-class VpnTile3 : VpnTileBase(3)

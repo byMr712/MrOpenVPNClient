@@ -5,24 +5,16 @@ import android.content.Context
 import android.os.Build
 import android.service.quicksettings.TileService
 import com.mropenovpn.client.activities.VpnTile0
-import com.mropenovpn.client.activities.VpnTile1
-import com.mropenovpn.client.activities.VpnTile2
-import com.mropenovpn.client.activities.VpnTile3
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ProfileManager
 
 object VpnTileManager {
-    const val SLOT_COUNT = 4
+    const val SLOT_COUNT = 1
     private const val FILE = "vpn_tiles"
     private const val PREFIX_SLOT = "slot_"
     private const val PREFIX_REQUESTED = "req_"
 
-    fun tileClass(slot: Int): Class<*> = when (slot) {
-        0 -> VpnTile0::class.java
-        1 -> VpnTile1::class.java
-        2 -> VpnTile2::class.java
-        else -> VpnTile3::class.java
-    }
+    fun tileClass(slot: Int): Class<*> = VpnTile0::class.java
 
     fun componentName(context: Context, slot: Int): ComponentName =
         ComponentName(context, tileClass(slot))

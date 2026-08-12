@@ -35,8 +35,14 @@ open class BaseActivity : AppCompatActivity() {
         if (!pendingRecreate && accentAtCreate != VpnPrefs.accentColor(this)) {
             pendingRecreate = true
             recreate()
-        } else {
-            pendingRecreate = false
+            return
+        }
+        pendingRecreate = false
+        val accent = VpnPrefs.accentColor(this)
+        if (accent.isNotEmpty()) {
+            window.decorView.post {
+                ExperimentalThemes.applyAccentOverlay(this, accent)
+            }
         }
     }
 

@@ -67,7 +67,9 @@
     <string name="source_code">Исходный код</string>
 
     <string name="add_user">Добавить пользователя</string>
+    <string name="select_user">Выберите пользователя</string>
     <string name="no_users">Пока нет сохранённых пользователей</string>
+    <string name="user_selected">Пользователь %1$s выбран</string>
     <string name="delete_user">Удалить пользователя</string>
     <string name="delete_user_confirm">Удалить пользователя %1$s?</string>
     <string name="user_has_password">пароль сохранён</string>
@@ -98,7 +100,7 @@
     <string name="settings_debug_mode">Режим отладки</string>
     <string name="settings_debug_mode_summary">Показывать кнопку «Копировать логи»</string>
     <string name="settings_experimental_themes">Экспериментальные темы</string>
-    <string name="settings_experimental_themes_summary">Альтернативные дизайны приложения (нужен режим отладки)</string>
+    <string name="settings_experimental_themes_summary">Альтернативные дизайны приложения</string>
     <string name="clear_users">Удалить всех пользователей</string>
     <string name="clear_users_confirm">Удалить все сохранённые логины и пароли?</string>
     <string name="settings_version">Версия: %1$s</string>
@@ -120,4 +122,5 @@
     <string name="theme_dialog_message">Включение обычных тем выключит экспериментальные — согласны?</string>
     <string name="accent_title">Цвет-акцент</string>
     <string name="accent_hint">Применяется сразу, без перезапуска</string>
+    <string name="accent_custom_hint">Свой цвет: HEX (например, #1E88E5 или 1E88E5)</string>
 </resources>

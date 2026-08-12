@@ -68,3 +68,26 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 }
+
+val apkVersion = "v${android.defaultConfig.versionName}"
+
+tasks.register("copyApkToRoot") {
+    group = "build"
+    description = "Copy the built APKs to the project root"
+    doLast {
+        copy {
+            from(layout.buildDirectory.dir("outputs/apk/debug"))
+            from(layout.buildDirectory.dir("outputs/apk/release"))
+            include("*.apk")
+            into(rootProject.layout.projectDirectory)
+            rename { name ->
+                if (name.contains("debug")) "MrOpenVPNClient-$apkVersion-debug.apk"
+                else "MrOpenVPNClient-$apkVersion.apk"
+            }
+        }
+    }
+}
+
+tasks.matching { it.name in setOf("assembleDebug", "assembleRelease") }.configureEach {
+    finalizedBy("copyApkToRoot")
+}

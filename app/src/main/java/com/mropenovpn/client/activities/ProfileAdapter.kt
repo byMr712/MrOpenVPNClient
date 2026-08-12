@@ -12,7 +12,8 @@ import de.blinkt.openvpn.core.VpnStatus
 
 class ProfileAdapter(
     private val onConnect: (VpnProfile) -> Unit,
-    private val onDisconnect: () -> Unit
+    private val onDisconnect: () -> Unit,
+    private val onSelectUser: (VpnProfile) -> Unit
 ) : RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder>() {
 
     private val profiles = mutableListOf<VpnProfile>()
@@ -42,6 +43,8 @@ class ProfileAdapter(
 
         fun bind(profile: VpnProfile) {
             nameText.text = profile.mName
+            nameText.isClickable = true
+            nameText.setOnClickListener { onSelectUser(profile) }
             if (profile.mUsername.isNotEmpty()) {
                 userText.text = profile.mUsername
                 userText.visibility = View.VISIBLE

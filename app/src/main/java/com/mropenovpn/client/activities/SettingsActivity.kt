@@ -35,15 +35,14 @@ class SettingsActivity : BaseActivity() {
         }
 
         val experimentalEntry = findViewById<View>(R.id.experimentalEntry)
+        experimentalEntry.setOnClickListener {
+            startActivity(Intent(this, ExperimentalThemesActivity::class.java))
+        }
+
         val swDebugMode = findViewById<MaterialSwitch>(R.id.swDebugMode)
         swDebugMode.isChecked = VpnPrefs.debugMode(this)
         swDebugMode.setOnCheckedChangeListener { _, checked ->
             VpnPrefs.setDebugMode(this, checked)
-            updateDebugSectionVisibility(experimentalEntry, checked)
-        }
-        updateDebugSectionVisibility(experimentalEntry, VpnPrefs.debugMode(this))
-        experimentalEntry.setOnClickListener {
-            startActivity(Intent(this, ExperimentalThemesActivity::class.java))
         }
 
         val swLightTheme = findViewById<MaterialSwitch>(R.id.swLightTheme)
@@ -58,6 +57,7 @@ class SettingsActivity : BaseActivity() {
                 suppressThemeToggle = false
                 confirmDisableExperimentalThemes {
                     VpnPrefs.setExperimentalTheme(this, "")
+                    VpnPrefs.setAccentColor(this, "")
                     VpnPrefs.setLightTheme(this, checked)
                     AppCompatDelegate.setDefaultNightMode(
                         if (checked) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_YES
@@ -126,10 +126,6 @@ class SettingsActivity : BaseActivity() {
         val swLightTheme = findViewById<MaterialSwitch>(R.id.swLightTheme)
         swLightTheme.isChecked = VpnPrefs.isLightTheme(this)
         suppressThemeToggle = false
-    }
-
-    private fun updateDebugSectionVisibility(entry: View, enabled: Boolean) {
-        entry.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
     private fun updateThemeSummary(summary: TextView, light: Boolean) {
