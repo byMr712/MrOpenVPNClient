@@ -15,6 +15,7 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import com.google.android.material.materialswitch.MaterialSwitch
 
 object ExperimentalThemes {
 
@@ -136,35 +137,55 @@ object ExperimentalThemes {
         val uncheckedTrack = (onSurface and 0x00FFFFFF) or 0x33000000.toInt()
 
         fun tint(view: View) {
-            when (view) {
-                is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
-                is EditText -> view.backgroundTintList = ColorStateList.valueOf(accent)
-                is TextView -> if (view.currentTextColor == primary) {
+            when {
+                view is MaterialSwitch -> {
+                    view.trackTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(accent, uncheckedTrack)
+                    )
+                    view.thumbTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(onAccent, onSurface)
+                    )
+                    view.thumbIconTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(onAccent, onSurface)
+                    )
+                }
+                view is SwitchCompat -> {
+                    view.trackTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(accent, uncheckedTrack)
+                    )
+                    view.thumbTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(onAccent, onSurface)
+                    )
+                }
+                view is Switch -> {
+                    view.trackTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(accent, uncheckedTrack)
+                    )
+                    view.thumbTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(onAccent, onSurface)
+                    )
+                }
+                view is RadioButton -> view.buttonTintList = ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(accent, onSurface)
+                )
+                view is CheckBox -> view.buttonTintList = ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(accent, onSurface)
+                )
+                view is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
+                view is EditText -> view.backgroundTintList = ColorStateList.valueOf(accent)
+                view is TextView -> if (view.currentTextColor == primary) {
                     view.setTextColor(accent)
                 }
-                is CheckBox -> view.buttonTintList = ColorStateList.valueOf(accent)
-                is RadioButton -> view.buttonTintList = ColorStateList.valueOf(accent)
-                is ImageView -> view.imageTintList = ColorStateList.valueOf(accent)
-                is SwitchCompat -> {
-                    view.trackTintList = ColorStateList(
-                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                        intArrayOf(accent, uncheckedTrack)
-                    )
-                    view.thumbTintList = ColorStateList(
-                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                        intArrayOf(onAccent, onSurface)
-                    )
-                }
-                is Switch -> {
-                    view.trackTintList = ColorStateList(
-                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                        intArrayOf(accent, uncheckedTrack)
-                    )
-                    view.thumbTintList = ColorStateList(
-                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                        intArrayOf(onAccent, onSurface)
-                    )
-                }
+                view is ImageView -> view.imageTintList = ColorStateList.valueOf(accent)
             }
             if (view is ViewGroup) {
                 for (i in 0 until view.childCount) tint(view.getChildAt(i))
