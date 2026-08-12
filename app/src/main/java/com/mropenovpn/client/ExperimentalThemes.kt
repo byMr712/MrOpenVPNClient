@@ -11,6 +11,20 @@ object ExperimentalThemes {
         val styleRes: Int
     )
 
+    data class AccentDef(
+        val hex: String,
+        val styleRes: Int
+    )
+
+    val accents = listOf(
+        AccentDef("#1E88E5", R.style.AppThemeOverlay_Accent_Blue),
+        AccentDef("#2E7D32", R.style.AppThemeOverlay_Accent_Green),
+        AccentDef("#EF6C00", R.style.AppThemeOverlay_Accent_Orange),
+        AccentDef("#8E24AA", R.style.AppThemeOverlay_Accent_Purple),
+        AccentDef("#D81B60", R.style.AppThemeOverlay_Accent_Pink),
+        AccentDef("#00897B", R.style.AppThemeOverlay_Accent_Teal)
+    )
+
     val themes = listOf(
         ThemeDef(
             id = "neon",
@@ -52,4 +66,15 @@ object ExperimentalThemes {
     fun styleFor(context: Context): Int = themeFor(context)?.styleRes ?: 0
 
     fun isExperimental(context: Context): Boolean = styleFor(context) != 0
+
+    fun accentStyleFor(context: Context): Int {
+        val hex = VpnPrefs.accentColor(context)
+        if (hex.isEmpty()) return 0
+        return accents.firstOrNull { it.hex.equals(hex, ignoreCase = true) }?.styleRes ?: 0
+    }
+
+    fun applyAccent(context: Context) {
+        val styleRes = accentStyleFor(context)
+        if (styleRes != 0) context.theme.applyStyle(styleRes, true)
+    }
 }

@@ -39,7 +39,6 @@ class ProfileAdapter(
         private val nameText: TextView = itemView.findViewById(R.id.profileNameText)
         private val userText: TextView = itemView.findViewById(R.id.profileUserText)
         private val connectButton: Button = itemView.findViewById(R.id.connectButton)
-        private val disconnectButton: Button = itemView.findViewById(R.id.disconnectButton)
 
         fun bind(profile: VpnProfile) {
             nameText.text = profile.mName
@@ -50,10 +49,12 @@ class ProfileAdapter(
                 userText.visibility = View.GONE
             }
             val active = VpnStatus.isVPNActive()
-            connectButton.isEnabled = !active
-            disconnectButton.isEnabled = active
-            connectButton.setOnClickListener { onConnect(profile) }
-            disconnectButton.setOnClickListener { onDisconnect() }
+            connectButton.text = itemView.context.getString(
+                if (active) R.string.disconnect else R.string.connect
+            )
+            connectButton.setOnClickListener {
+                if (active) onDisconnect() else onConnect(profile)
+            }
         }
     }
 }

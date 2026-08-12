@@ -13,7 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -99,10 +98,6 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             copyLogToClipboard()
         }
 
-        findViewById<Button>(R.id.connectBigButton).setOnClickListener {
-            onBigConnectClick()
-        }
-
         applyExperimentalTheme()
 
         OpenVPNService.setNotificationActivityClass(MainActivity::class.java)
@@ -135,55 +130,18 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             if (VpnPrefs.debugMode(this)) View.VISIBLE else View.GONE
     }
 
-    private fun updateConnectButton() {
-        findViewById<Button>(R.id.connectBigButton).text = getString(
-            if (VpnStatus.isVPNActive()) R.string.main_disconnect else R.string.main_connect
-        )
-    }
-
-    private fun onBigConnectClick() {
-        if (VpnStatus.isVPNActive()) {
-            disconnectCurrent()
-            return
-        }
-        val pm = ProfileManager.getInstance(this)
-        val profile = VpnPrefs.lastProfileUuid(this)?.let { uuid ->
-            pm.getProfiles().firstOrNull { it.uuid.toString() == uuid }
-        } ?: pm.getProfiles().firstOrNull()
-        if (profile == null) {
-            openDocument.launch(arrayOf("*/*"))
-        } else {
-            connectToProfile(profile)
-        }
-    }
-
     private fun applyExperimentalTheme() {
         val themeId = VpnPrefs.experimentalTheme(this)
         if (themeId.isEmpty()) return
         val density = resources.displayMetrics.density
-        val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.connectBigButton)
         val card = findViewById<com.google.android.material.card.MaterialCardView>(R.id.statusCard)
         when (themeId) {
             "neon" -> {
-                val lp = button.layoutParams
-                lp.width = ViewGroup.LayoutParams.MATCH_PARENT
-                lp.height = (60 * density).toInt()
-                button.layoutParams = lp
-                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes(0f)
-                    .build()
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
                     .setAllCornerSizes(0f)
                     .build()
             }
             "oled" -> {
-                button.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
-                button.strokeColor = ColorStateList.valueOf(Color.WHITE)
-                button.strokeWidth = (2 * density).toInt()
-                button.setTextColor(Color.WHITE)
-                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes(1000f)
-                    .build()
                 card.setCardBackgroundColor(ColorStateList.valueOf(Color.TRANSPARENT))
                 card.strokeWidth = (1 * density).toInt()
                 card.setStrokeColor(ColorStateList.valueOf(Color.WHITE))
@@ -192,25 +150,16 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                     .build()
             }
             "redline" -> {
-                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes((6 * density))
-                    .build()
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
                     .setAllCornerSizes((4 * density))
                     .build()
             }
             "paper" -> {
-                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes((24 * density))
-                    .build()
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
                     .setAllCornerSizes((28 * density))
                     .build()
             }
             "mint" -> {
-                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes((button.height / 2).toFloat())
-                    .build()
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
                     .setAllCornerSizes((28 * density))
                     .build()
@@ -236,16 +185,17 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
+        findViewById<View>(R.id.aboutEntry).setOnClickListener {
+            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
+            showAboutDialog()
+        }
+
         navView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_profiles -> drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
                 R.id.nav_users -> {
                     drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
                     startActivity(Intent(this, UsersActivity::class.java))
-                }
-                R.id.nav_about -> {
-                    drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
-                    showAboutDialog()
                 }
                 R.id.nav_lang_en -> {
                     drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
@@ -358,7 +308,6 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
     override fun setConnectedVPN(uuid: String?) {
         runOnUiThread {
             refreshProfileList()
-            updateConnectButton()
         }
     }
 
@@ -543,7 +492,6 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             if (active) R.string.state_connected else R.string.state_disconnected
         )
         statusLevelText.setTextColor(themeColor(com.google.android.material.R.attr.colorPrimary))
-        updateConnectButton()
     }
 
     private fun requestNotificationPermissionIfNeeded() {

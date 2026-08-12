@@ -15,6 +15,7 @@ object VpnPrefs {
     private const val KEY_LIGHT_THEME = "light_theme"
     private const val KEY_NOTIFY = "notify"
     private const val KEY_EXPERIMENTAL_THEME = "experimental_theme"
+    private const val KEY_ACCENT = "accent_color"
 
     fun notifyEnabled(context: Context): Boolean =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -33,10 +34,13 @@ object VpnPrefs {
             ?: ""
 
     fun setExperimentalTheme(context: Context, id: String) {
+        // commit() is required here: the app is killed immediately after this
+        // via restartApp(), so an async apply() would be lost before the
+        // process exits and the experimental theme would not be applied.
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_EXPERIMENTAL_THEME, id)
-            .apply()
+            .commit()
     }
 
     fun language(context: Context): String =
@@ -48,6 +52,18 @@ object VpnPrefs {
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_LANGUAGE, tag)
+            .apply()
+    }
+
+    fun accentColor(context: Context): String =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getString(KEY_ACCENT, "")
+            ?: ""
+
+    fun setAccentColor(context: Context, hex: String) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_ACCENT, hex)
             .apply()
     }
 
@@ -67,10 +83,13 @@ object VpnPrefs {
             .getBoolean(KEY_LIGHT_THEME, false)
 
     fun setLightTheme(context: Context, value: Boolean) {
+        // commit() is required here: toggling the light theme while an
+        // experimental theme is active is followed by restartApp(), and an
+        // async apply() could be lost when the process is killed.
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .edit()
             .putBoolean(KEY_LIGHT_THEME, value)
-            .apply()
+            .commit()
     }
 
     fun lastProfileUuid(context: Context): String? =

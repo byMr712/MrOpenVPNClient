@@ -15,4 +15,34 @@
     <color name="error">#BA1A1A</color>
 
     <color name="ic_launcher_background">#00E676</color>
+
+    <color name="accent_blue">#1E88E5</color>
+    <color name="accent_blue_on">#FFFFFF</color>
+    <color name="accent_blue_container">#D3E4FF</color>
+    <color name="accent_blue_on_container">#001D36</color>
+
+    <color name="accent_green">#2E7D32</color>
+    <color name="accent_green_on">#FFFFFF</color>
+    <color name="accent_green_container">#B7F0C0</color>
+    <color name="accent_green_on_container">#00210B</color>
+
+    <color name="accent_orange">#EF6C00</color>
+    <color name="accent_orange_on">#FFFFFF</color>
+    <color name="accent_orange_container">#FFDCC3</color>
+    <color name="accent_orange_on_container">#311300</color>
+
+    <color name="accent_purple">#8E24AA</color>
+    <color name="accent_purple_on">#FFFFFF</color>
+    <color name="accent_purple_container">#F5D6FF</color>
+    <color name="accent_purple_on_container">#2F0052</color>
+
+    <color name="accent_pink">#D81B60</color>
+    <color name="accent_pink_on">#FFFFFF</color>
+    <color name="accent_pink_container">#FFD9E2</color>
+    <color name="accent_pink_on_container">#40000D</color>
+
+    <color name="accent_teal">#00897B</color>
+    <color name="accent_teal_on">#FFFFFF</color>
+    <color name="accent_teal_container">#A7F3EA</color>
+    <color name="accent_teal_on_container">#00201C</color>
 </resources>

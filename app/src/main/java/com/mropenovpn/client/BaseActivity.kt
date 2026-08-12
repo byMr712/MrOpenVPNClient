@@ -10,6 +10,9 @@ import java.util.Locale
 open class BaseActivity : AppCompatActivity() {
     protected open val experimentalThemeEnabled: Boolean get() = true
 
+    private var accentAtCreate: String? = null
+    private var pendingRecreate = false
+
     override fun attachBaseContext(newBase: Context) {
         val tag = VpnPrefs.language(newBase)
         val config = Configuration(newBase.resources.configuration)
@@ -23,6 +26,18 @@ open class BaseActivity : AppCompatActivity() {
             if (themeRes != 0) setTheme(themeRes)
         }
         super.onCreate(savedInstanceState)
+        accentAtCreate = VpnPrefs.accentColor(this)
+        ExperimentalThemes.applyAccent(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!pendingRecreate && accentAtCreate != VpnPrefs.accentColor(this)) {
+            pendingRecreate = true
+            recreate()
+        } else {
+            pendingRecreate = false
+        }
     }
 
     protected fun restartApp() {

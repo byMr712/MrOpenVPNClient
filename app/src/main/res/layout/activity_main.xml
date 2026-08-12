@@ -73,25 +73,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/connectBigButton"
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:text="@string/main_connect"
-                        android:textAppearance="?attr/textAppearanceHeadlineMedium"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="12.5dp" />
-                </LinearLayout>
-
                 <Button
                     android:id="@+id/copyLogButton"
                     style="?attr/materialButtonOutlinedStyle"
@@ -140,14 +121,16 @@
             android:layout_weight="1"
             android:background="?android:attr/colorBackground"
             android:fitsSystemWindows="true"
-            
-            
+            app:dividerInsetEnd="16dp"
+            app:dividerInsetStart="16dp"
             app:menu="@menu/drawer_menu" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="?attr/colorOutline" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/colorOutlineVariant" />
 
         <LinearLayout
             android:id="@+id/settingsEntry"
@@ -170,6 +153,38 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@string/menu_settings"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/colorOutlineVariant" />
+
+        <LinearLayout
+            android:id="@+id/aboutEntry"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_menu_about"
+                app:tint="?attr/colorOnSurface" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/menu_about"
                 android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:textColor="?attr/colorOnSurface" />
         </LinearLayout>

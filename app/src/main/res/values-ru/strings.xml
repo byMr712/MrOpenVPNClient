@@ -118,4 +118,6 @@
     <string name="theme_mint_desc">Лёгкий светлый дизайн с мятным акцентом</string>
     <string name="theme_dialog_title">Обычная тема</string>
     <string name="theme_dialog_message">Включение обычных тем выключит экспериментальные — согласны?</string>
+    <string name="accent_title">Цвет-акцент</string>
+    <string name="accent_hint">Применяется сразу, без перезапуска</string>
 </resources>

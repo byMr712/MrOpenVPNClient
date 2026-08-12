@@ -118,4 +118,6 @@
     <string name="theme_mint_desc">Light airy design with a teal accent</string>
     <string name="theme_dialog_title">Standard theme</string>
     <string name="theme_dialog_message">Enabling standard themes will disable experimental themes. Continue?</string>
+    <string name="accent_title">Accent color</string>
+    <string name="accent_hint">Applied immediately, no restart</string>
 </resources>
