@@ -15,6 +15,7 @@ object VpnPrefs {
     private const val KEY_EXPERIMENTAL_THEME = "experimental_theme"
     private const val KEY_LIGHT_THEME = "light_theme"
     private const val KEY_ACCENT = "accent_color"
+    private const val KEY_STATUS_ANIM = "status_outline_anim"
 
     fun notifyEnabled(context: Context): Boolean =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -88,6 +89,18 @@ object VpnPrefs {
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .edit()
             .putBoolean(KEY_DEBUG_MODE, value)
+            .apply()
+    }
+
+    fun statusOutlineAnim(context: Context): String =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getString(KEY_STATUS_ANIM, "pulse")
+            ?: "pulse"
+
+    fun setStatusOutlineAnim(context: Context, id: String) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_STATUS_ANIM, id)
             .apply()
     }
 

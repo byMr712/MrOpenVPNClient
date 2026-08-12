@@ -52,5 +52,6 @@
         android:layout_margin="16dp"
         android:text="@string/add_user"
         app:cornerRadius="16dp"
-        app:strokeWidth="1dp" />
+        app:strokeWidth="2dp"
+        app:strokeColor="?attr/colorPrimary" />
 </LinearLayout>

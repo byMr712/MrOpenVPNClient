@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -52,11 +51,14 @@ import java.io.InputStreamReader
 class MainActivity : BaseActivity(), VpnStatus.StateListener {
 
     private lateinit var statusLevelText: TextView
+    private lateinit var statusCard: com.google.android.material.card.MaterialCardView
+    private lateinit var statusOutlineAnimator: StatusOutlineAnimator
     private lateinit var profileList: RecyclerView
     private lateinit var adapter: ProfileAdapter
     private lateinit var drawerLayout: DrawerLayout
 
     private var pendingProfile: VpnProfile? = null
+    private var lastLevel: ConnectionStatus? = null
 
     private val openDocument =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -84,6 +86,8 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         setContentView(R.layout.activity_main)
 
         statusLevelText = findViewById(R.id.statusLevelText)
+        statusCard = findViewById(R.id.statusCard)
+        statusOutlineAnimator = StatusOutlineAnimator(this, statusCard)
         profileList = findViewById(R.id.profileList)
 
         adapter = ProfileAdapter(
@@ -155,7 +159,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         val themeId = VpnPrefs.experimentalTheme(this)
         if (themeId.isEmpty()) return
         val density = resources.displayMetrics.density
-        val card = findViewById<com.google.android.material.card.MaterialCardView>(R.id.statusCard)
+        val card = statusCard
         when (themeId) {
             "neon" -> {
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
@@ -164,8 +168,6 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             }
             "oled" -> {
                 card.setCardBackgroundColor(ColorStateList.valueOf(Color.TRANSPARENT))
-                card.strokeWidth = (1 * density).toInt()
-                card.setStrokeColor(ColorStateList.valueOf(Color.WHITE))
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
                     .setAllCornerSizes((16 * density))
                     .build()
@@ -250,8 +252,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         }
         navView.itemBackground = itemBackground
 
-        val onSurface = themeColor(com.google.android.material.R.attr.colorOnSurface)
-        val color = ColorStateList.valueOf(onSurface)
+        val color = ColorStateList.valueOf(accent)
         navView.itemTextColor = color
         navView.itemIconTintList = color
     }
@@ -304,6 +305,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
     }
 
     override fun onStop() {
+        statusOutlineAnimator.stop()
         VpnStatus.removeStateListener(this)
         super.onStop()
     }
@@ -321,31 +323,38 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         }
     }
 
-    private fun updateStatusLevel(level: ConnectionStatus) {
-        val error = level == ConnectionStatus.LEVEL_AUTH_FAILED ||
-            level == ConnectionStatus.LEVEL_NONETWORK
-        val connecting = level == ConnectionStatus.LEVEL_CONNECTING_SERVER_REPLIED ||
+    private fun isConnecting(level: ConnectionStatus): Boolean =
+        level == ConnectionStatus.LEVEL_CONNECTING_SERVER_REPLIED ||
             level == ConnectionStatus.LEVEL_CONNECTING_NO_SERVER_REPLY_YET ||
             level == ConnectionStatus.LEVEL_START ||
             level == ConnectionStatus.LEVEL_WAITING_FOR_USER_INPUT ||
             level == ConnectionStatus.LEVEL_VPNPAUSED
+
+    private fun updateStatusLevel(level: ConnectionStatus) {
+        lastLevel = level
+        val error = level == ConnectionStatus.LEVEL_AUTH_FAILED ||
+            level == ConnectionStatus.LEVEL_NONETWORK
         statusLevelText.text = when {
             level == ConnectionStatus.LEVEL_CONNECTED -> getString(R.string.state_connected)
             error -> getString(R.string.state_error)
-            connecting -> getString(R.string.state_connecting)
+            isConnecting(level) -> getString(R.string.state_connecting)
             else -> getString(R.string.state_disconnected)
         }
         statusLevelText.setTextColor(
-            if (error) {
-                themeColor(com.google.android.material.R.attr.colorError)
-            } else {
-                ExperimentalThemes.accentOrDefaultColor(
-                    this,
-                    themeColor(com.google.android.material.R.attr.colorPrimary)
-                )
-            }
+            ExperimentalThemes.accentOrDefaultColor(
+                this,
+                themeColor(com.google.android.material.R.attr.colorPrimary)
+            )
         )
+        statusOutlineAnimator.setState(outlineStateFor(level))
     }
+
+    private fun outlineStateFor(level: ConnectionStatus): StatusOutlineAnimator.State =
+        when {
+            level == ConnectionStatus.LEVEL_CONNECTED -> StatusOutlineAnimator.State.CONNECTED
+            isConnecting(level) -> StatusOutlineAnimator.State.CONNECTING
+            else -> StatusOutlineAnimator.State.DISCONNECTED
+        }
 
     private fun themeColor(attr: Int): Int {
         val ta = obtainStyledAttributes(intArrayOf(attr))
@@ -396,85 +405,101 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
 
     private fun showUserPicker(profile: VpnProfile) {
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_user_picker, null)
-        val list = view.findViewById<LinearLayout>(R.id.userPickerList)
-        val users = VpnUsers.users(this)
-        val current = profile.mUsername
+        val userSelect = view.findViewById<Spinner>(R.id.userSelect)
+        val profileNameInput = view.findViewById<EditText>(R.id.profileNameInput)
+        profileNameInput.setText(profile.mName)
 
         val dialog = AlertDialog.Builder(this)
-            .setTitle(R.string.select_user)
+            .setTitle(R.string.profile_edit)
             .setView(view)
-            .setNegativeButton(R.string.close, null)
             .create()
 
-        if (users.isEmpty()) {
-            list.addView(
-                TextView(this).apply {
-                    setText(R.string.no_users)
-                    setPadding(16, 8, 16, 16)
-                    setTextAppearance(this@MainActivity, com.google.android.material.R.style.TextAppearance_Material3_BodySmall)
-                }
+        fun refreshUserSelect(select: String? = null) {
+            val users = VpnUsers.users(this)
+            val items = mutableListOf(getString(R.string.no_account)).apply { addAll(users) }
+            userSelect.adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                items
             )
-        } else {
-            users.sortedBy { it != current }.forEach { login ->
-                list.addView(
-                    com.google.android.material.radiobutton.MaterialRadioButton(this).apply {
-                        text = login
-                        isChecked = login == current
-                        setOnClickListener {
-                            selectUserForProfile(profile, login)
-                            dialog.dismiss()
-                        }
-                    }
-                )
-            }
+            val target = select ?: profile.mUsername
+            val index = if (target.isNotEmpty()) users.indexOf(target) else -1
+            userSelect.setSelection(if (index >= 0) index + 1 else 0)
         }
 
+        refreshUserSelect()
+
         view.findViewById<Button>(R.id.pickAddUserButton).setOnClickListener {
-            showAddUserAndSelect(profile) { dialog.dismiss() }
+            showAddUserAndSelect { login -> refreshUserSelect(login) }
         }
-        view.findViewById<Button>(R.id.pickRenameButton).setOnClickListener {
-            showRenameDialog(profile) { dialog.dismiss() }
+
+        view.findViewById<Button>(R.id.deleteProfileButton).setOnClickListener {
+            dialog.dismiss()
+            confirmDeleteProfile(profile)
         }
+
+        view.findViewById<Button>(R.id.closeProfileButton).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        view.findViewById<Button>(R.id.saveProfileButton).setOnClickListener {
+            val users = VpnUsers.users(this)
+            val selected = userSelect.selectedItemPosition
+            if (selected <= 0) {
+                profile.mUsername = ""
+                profile.mPassword = ""
+            } else {
+                val login = users[selected - 1]
+                profile.mUsername = login
+                profile.mPassword = VpnUsers.password(this, login) ?: ""
+                VpnStatus.logInfo(R.string.user_selected, login)
+            }
+            val newName = profileNameInput.text.toString().trim()
+            if (newName.isNotEmpty() && newName != profile.mName) {
+                profile.mName = uniqueName(newName)
+                VpnStatus.logInfo(R.string.profile_renamed, profile.mName)
+            }
+            ProfileManager.saveProfile(this, profile)
+            refreshProfileList()
+            dialog.dismiss()
+        }
+
         dialog.show()
         ExperimentalThemes.applyAccentToDialog(dialog)
     }
 
-    private fun showRenameDialog(profile: VpnProfile, onDone: () -> Unit) {
-        val input = EditText(this).apply {
-            setText(profile.mName)
-            setSingleLine(true)
-            setSelectAllOnFocus(true)
-            setPadding(24, 12, 24, 12)
-        }
-        AlertDialog.Builder(this)
-            .setTitle(R.string.rename_profile)
-            .setView(input)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val newName = input.text.toString().trim()
-                if (newName.isEmpty() || newName == profile.mName) {
-                    onDone()
-                } else {
-                    profile.mName = uniqueName(newName)
-                    ProfileManager.saveProfile(this, profile)
-                    VpnStatus.logInfo(R.string.profile_renamed, profile.mName)
-                    refreshProfileList()
-                    onDone()
-                }
+    private fun confirmDeleteProfile(profile: VpnProfile) {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_delete_profile, null)
+        view.findViewById<TextView>(R.id.deleteMessageText).text =
+            getString(R.string.delete_profile) + "\n" +
+                getString(R.string.delete_profile_confirm_name, profile.mName)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(view)
+            .create()
+
+        view.findViewById<Button>(R.id.confirmDeleteButton).setOnClickListener {
+            if (VpnStatus.isVPNActive() &&
+                profile.uuid.toString() == VpnStatus.getLastConnectedVPNProfile()
+            ) {
+                disconnectCurrent()
             }
-            .setNegativeButton(R.string.close, null)
-            .show()
-            .also { ExperimentalThemes.applyAccentToDialog(it) }
+            ProfileManager.getInstance(this).removeProfile(this, profile)
+            VpnStatus.logInfo(R.string.profile_deleted, profile.mName)
+            refreshProfileList()
+            VpnTileManager.sync(this)
+            dialog.dismiss()
+        }
+
+        view.findViewById<Button>(R.id.cancelDeleteButton).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        ExperimentalThemes.applyAccentToDialog(dialog)
     }
 
-    private fun selectUserForProfile(profile: VpnProfile, login: String) {
-        profile.mUsername = login
-        profile.mPassword = VpnUsers.password(this, login) ?: ""
-        ProfileManager.saveProfile(this, profile)
-        VpnStatus.logInfo(R.string.user_selected, login)
-        refreshProfileList()
-    }
-
-    private fun showAddUserAndSelect(profile: VpnProfile, onDone: () -> Unit) {
+    private fun showAddUserAndSelect(onUserAdded: (String) -> Unit) {
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_add_user, null)
         AlertDialog.Builder(this)
             .setTitle(R.string.add_user)
@@ -487,8 +512,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 } else {
                     VpnUsers.save(this, username, password)
                     VpnStatus.logInfo(R.string.user_added, username)
-                    selectUserForProfile(profile, username)
-                    onDone()
+                    onUserAdded(username)
                 }
             }
             .setNegativeButton(R.string.close, null)
@@ -594,7 +618,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 parser.parseConfig(BufferedReader(InputStreamReader(it)))
             }
             val profile = parser.convertProfile()
-            profile.mName = uniqueName(profile.mName.ifBlank { nextNumberedName() })
+            profile.mName = nextNumberedName()
 
             val pm = ProfileManager.getInstance(this)
             pm.addProfile(profile)
@@ -649,9 +673,13 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
     }
 
     private fun updateStatusUi() {
-        val active = VpnStatus.isVPNActive()
+        val level = lastLevel ?: ConnectionStatus.LEVEL_NOTCONNECTED
         statusLevelText.text = getString(
-            if (active) R.string.state_connected else R.string.state_disconnected
+            when {
+                level == ConnectionStatus.LEVEL_CONNECTED -> R.string.state_connected
+                isConnecting(level) -> R.string.state_connecting
+                else -> R.string.state_disconnected
+            }
         )
         statusLevelText.setTextColor(
             ExperimentalThemes.accentOrDefaultColor(
@@ -659,6 +687,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 themeColor(com.google.android.material.R.attr.colorPrimary)
             )
         )
+        statusOutlineAnimator.setState(outlineStateFor(level))
     }
 
     private fun requestNotificationPermissionIfNeeded() {

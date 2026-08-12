@@ -1,28 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
+    <TextView
+        android:id="@+id/userSelectLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/user_select_label"
+        android:textAppearance="?attr/textAppearanceLabelLarge" />
+
+    <Spinner
+        android:id="@+id/userSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:contentDescription="@string/user_select_hint" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pickAddUserButton"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/add_user" />
+        android:layout_marginTop="12dp"
+        android:text="@string/add_user"
+        app:cornerRadius="16dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="?attr/colorPrimary" />
+
+    <TextView
+        android:id="@+id/profileNameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/profile_name"
+        android:textAppearance="?attr/textAppearanceLabelLarge" />
+
+    <EditText
+        android:id="@+id/profileNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:hint="@string/profile_name"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/pickRenameButton"
-        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:id="@+id/saveProfileButton"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/rename_profile" />
+        android:layout_marginTop="16dp"
+        android:text="@string/save"
+        app:cornerRadius="16dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="?attr/colorPrimary" />
 
     <LinearLayout
-        android:id="@+id/userPickerList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical" />
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deleteProfileButton"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/delete_profile"
+            app:cornerRadius="16dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="?attr/colorPrimary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/closeProfileButton"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="@string/close"
+            app:cornerRadius="16dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="?attr/colorPrimary" />
+    </LinearLayout>
 </LinearLayout>

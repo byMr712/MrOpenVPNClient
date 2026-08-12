@@ -79,6 +79,13 @@
     <string name="users_cleared">Все сохранённые пользователи удалены</string>
     <string name="rename_profile">Переименовать профиль</string>
     <string name="profile_renamed">Профиль переименован в %1$s</string>
+    <string name="profile_edit">Редактировать профиль</string>
+    <string name="profile_name">Имя профиля</string>
+    <string name="user_select_label">Пользователь для подключения</string>
+    <string name="delete_profile">Удалить профиль</string>
+    <string name="delete_profile_confirm_name">%1$s?</string>
+    <string name="profile_deleted">Профиль %1$s удалён</string>
+    <string name="no_account">Без аккаунта</string>
 
     <string name="settings_notify_section">Уведомление</string>
     <string name="settings_show_notification">Показывать уведомление</string>

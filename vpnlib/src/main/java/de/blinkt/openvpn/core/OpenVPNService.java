@@ -832,6 +832,16 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             processThread = new OpenVPNThread(this, argv, nativeLibraryDirectory, tmpDir);
         }
 
+        // Fetch the initial network state before the OpenVPN process is
+        // started. Otherwise the process can send its first HOLD while the
+        // network state is still DISCONNECTED, which makes shouldBeRunning()
+        // report false and emits a spurious NONETWORK state (shown as "Error")
+        // until the async registration below has run. managmentCommand() is a
+        // safe no-op while the management socket is not yet connected.
+        final DeviceStateReceiver oldDeviceStateReceiver = mDeviceStateReceiver;
+        final DeviceStateReceiver newDeviceStateReceiver = new DeviceStateReceiver(mManagement);
+        newDeviceStateReceiver.networkStateChange(this);
+
         synchronized (mProcessLock) {
             mProcessThread = new Thread(processThread, "OpenVPNProcessThread");
             mProcessThread.start();
@@ -846,9 +856,6 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 return;
             }
         }
-
-        final DeviceStateReceiver oldDeviceStateReceiver = mDeviceStateReceiver;
-        final DeviceStateReceiver newDeviceStateReceiver = new DeviceStateReceiver(mManagement);
 
         guiHandler.post(() -> {
             if (oldDeviceStateReceiver != null)

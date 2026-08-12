@@ -79,6 +79,13 @@
     <string name="users_cleared">All saved users have been removed</string>
     <string name="rename_profile">Rename profile</string>
     <string name="profile_renamed">Profile renamed to %1$s</string>
+    <string name="profile_edit">Edit profile</string>
+    <string name="profile_name">Profile name</string>
+    <string name="user_select_label">User for connection</string>
+    <string name="delete_profile">Delete profile</string>
+    <string name="delete_profile_confirm_name">%1$s?</string>
+    <string name="profile_deleted">Profile %1$s deleted</string>
+    <string name="no_account">No account</string>
 
     <string name="settings_notify_section">Notification</string>
     <string name="settings_show_notification">Show notification</string>

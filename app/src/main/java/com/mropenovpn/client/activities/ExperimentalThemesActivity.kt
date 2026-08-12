@@ -124,8 +124,8 @@ class ExperimentalThemesActivity : BaseActivity() {
                 InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS or
                 InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
             setText(currentHex)
-            setTextColor(themeColor())
-            setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(themeColor(), 0x66))
+            setTextColor(accentColor())
+            setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(accentColor(), 0x66))
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -170,13 +170,8 @@ class ExperimentalThemesActivity : BaseActivity() {
 
     private fun refreshSwatches(swatchList: List<Swatch>) {
         val current = VpnPrefs.accentColor(this)
-        val density = resources.displayMetrics.density
         swatchList.forEach { sw ->
             val selected = sw.hex == current
-            sw.circle.setStroke(
-                (if (selected) 3 else 1) * density.toInt(),
-                if (selected) themeColor() else 0x33000000.toInt()
-            )
             sw.frame.removeAllViews()
             if (selected) sw.frame.addView(buildCheck(sw.hex))
         }
@@ -205,10 +200,6 @@ class ExperimentalThemesActivity : BaseActivity() {
         val circle = android.graphics.drawable.GradientDrawable().apply {
             shape = android.graphics.drawable.GradientDrawable.OVAL
             setColor(if (hex.isEmpty()) Color.TRANSPARENT else Color.parseColor(hex))
-            setStroke(
-                (if (selected) 3 else 1) * density.toInt(),
-                if (selected) themeColor() else 0x33000000.toInt()
-            )
         }
 
         val frame = FrameLayout(this).apply {
@@ -237,6 +228,9 @@ class ExperimentalThemesActivity : BaseActivity() {
         ta.recycle()
         return color
     }
+
+    private fun accentColor(): Int =
+        ExperimentalThemes.accentOrDefaultColor(this, themeColor())
 
     private fun contrastColor(hex: String): Int {
         if (hex.isEmpty()) return themeColor()

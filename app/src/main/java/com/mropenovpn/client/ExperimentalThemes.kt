@@ -152,7 +152,7 @@ object ExperimentalThemes {
             setColor(bgColor)
             cornerRadius = 16 * density
             if (accent != null) {
-                setStroke((1.5 * density).toInt(), accent)
+                setStroke((2 * density).toInt(), accent)
             }
         }
         window.setBackgroundDrawable(shape)
@@ -179,7 +179,6 @@ object ExperimentalThemes {
                 com.google.android.material.R.attr.colorOnSurface
             )
         )
-        val primary = ta.getColor(0, Color.BLACK)
         val onSurface = ta.getColor(1, Color.DKGRAY)
         ta.recycle()
 
@@ -222,14 +221,20 @@ object ExperimentalThemes {
                         intArrayOf(onAccent, onSurface)
                     )
                 }
-                view is RadioButton -> view.buttonTintList = ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                    intArrayOf(accent, onSurface)
-                )
-                view is CheckBox -> view.buttonTintList = ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                    intArrayOf(accent, onSurface)
-                )
+                view is RadioButton -> {
+                    view.buttonTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(accent, onSurface)
+                    )
+                    view.setTextColor(accent)
+                }
+                view is CheckBox -> {
+                    view.buttonTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(accent, onSurface)
+                    )
+                    view.setTextColor(accent)
+                }
                 view is MaterialButton -> {
                     val shapeBg = view.background as? MaterialShapeDrawable
                     val hasStroke = shapeBg?.strokeColor?.defaultColor?.let { Color.alpha(it) > 0 } == true
@@ -246,11 +251,16 @@ object ExperimentalThemes {
                     }
                 }
                 view is Spinner -> view.backgroundTintList = ColorStateList.valueOf(accent)
-                view is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
-                view is EditText -> view.backgroundTintList = ColorStateList.valueOf(accent)
-                view is TextView -> if (view.currentTextColor == primary) {
-                    view.setTextColor(accent)
+                view is Button -> {
+                    view.backgroundTintList = ColorStateList.valueOf(accent)
+                    view.setTextColor(onAccent)
                 }
+                view is EditText -> {
+                    view.backgroundTintList = ColorStateList.valueOf(accent)
+                    view.setTextColor(accent)
+                    view.setHintTextColor(accent)
+                }
+                view is TextView -> view.setTextColor(accent)
                 view is ImageView -> view.imageTintList = ColorStateList.valueOf(accent)
             }
             if (view is ViewGroup) {
