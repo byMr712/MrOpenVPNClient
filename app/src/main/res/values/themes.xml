@@ -46,6 +46,14 @@
         <item name="android:statusBarColor">#06070A</item>
         <item name="android:navigationBarColor">#06070A</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.MrOpenVPN.Mono.DisplaySmall</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.MrOpenVPN.Mono.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.MrOpenVPN.Mono.HeadlineSmall</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.MrOpenVPN.Mono.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.MrOpenVPN.Mono.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.MrOpenVPN.Mono.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.MrOpenVPN.Mono.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.MrOpenVPN.Mono.BodySmall</item>
     </style>
 
     <style name="Theme.MrOpenVPNClient.Oled" parent="Theme.MrOpenVPNClient">
@@ -65,6 +73,14 @@
         <item name="android:statusBarColor">#000000</item>
         <item name="android:navigationBarColor">#000000</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.MrOpenVPN.Light.DisplaySmall</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.MrOpenVPN.Light.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.MrOpenVPN.Light.HeadlineSmall</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.MrOpenVPN.Light.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.MrOpenVPN.Light.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.MrOpenVPN.Light.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.MrOpenVPN.Light.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.MrOpenVPN.Light.BodySmall</item>
     </style>
 
     <style name="Theme.MrOpenVPNClient.Paper" parent="Theme.MrOpenVPNClient">
@@ -86,6 +102,14 @@
         <item name="android:statusBarColor">#F5F0E6</item>
         <item name="android:navigationBarColor">#F5F0E6</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.MrOpenVPN.Serif.DisplaySmall</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.MrOpenVPN.Serif.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.MrOpenVPN.Serif.HeadlineSmall</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.MrOpenVPN.Serif.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.MrOpenVPN.Serif.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.MrOpenVPN.Serif.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.MrOpenVPN.Serif.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.MrOpenVPN.Serif.BodySmall</item>
     </style>
 
     <style name="Theme.MrOpenVPNClient.Redline" parent="Theme.MrOpenVPNClient">
@@ -107,6 +131,14 @@
         <item name="android:statusBarColor">#12090A</item>
         <item name="android:navigationBarColor">#12090A</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.MrOpenVPN.Condensed.DisplaySmall</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.MrOpenVPN.Condensed.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.MrOpenVPN.Condensed.HeadlineSmall</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.MrOpenVPN.Condensed.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.MrOpenVPN.Condensed.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.MrOpenVPN.Condensed.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.MrOpenVPN.Condensed.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.MrOpenVPN.Condensed.BodySmall</item>
     </style>
 
     <style name="Theme.MrOpenVPNClient.Mint" parent="Theme.MrOpenVPNClient">
@@ -128,5 +160,121 @@
         <item name="android:statusBarColor">#F7FBF9</item>
         <item name="android:navigationBarColor">#F7FBF9</item>
         <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="TextAppearance.MrOpenVPN.Mono.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Mono.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Mono.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Mono.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Mono.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Mono.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Mono.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Mono.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+
+    <style name="TextAppearance.MrOpenVPN.Light.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Light.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Light.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Light.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Light.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Light.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Light.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Light.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="TextAppearance.MrOpenVPN.Serif.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Serif.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Serif.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Serif.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Serif.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Serif.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Serif.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">serif</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Serif.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">serif</item>
+    </style>
+
+    <style name="TextAppearance.MrOpenVPN.Condensed.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Condensed.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Condensed.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Condensed.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Condensed.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Condensed.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Condensed.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.MrOpenVPN.Condensed.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 </resources>

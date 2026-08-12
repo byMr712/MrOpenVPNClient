@@ -48,6 +48,7 @@
                 android:padding="16dp">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/statusCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -67,7 +68,7 @@
                             android:gravity="center"
                             android:text="@string/state_disconnected"
                             android:textAppearance="?attr/textAppearanceDisplaySmall"
-                            android:textColor="@color/primary"
+                            android:textColor="?attr/colorPrimary"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -129,7 +130,7 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/background"
+        android:background="?android:attr/colorBackground"
         android:orientation="vertical">
 
         <com.google.android.material.navigation.NavigationView
@@ -137,16 +138,16 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/background"
+            android:background="?android:attr/colorBackground"
             android:fitsSystemWindows="true"
-            app:itemIconTint="@color/nav_icon_tint"
-            app:itemTextColor="@color/nav_text_tint"
+            
+            
             app:menu="@menu/drawer_menu" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/outline" />
+            android:background="?attr/colorOutline" />
 
         <LinearLayout
             android:id="@+id/settingsEntry"
@@ -162,7 +163,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_menu_settings"
-                app:tint="@color/nav_icon_tint" />
+                app:tint="?attr/colorOnSurface" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -170,7 +171,7 @@
                 android:layout_marginStart="16dp"
                 android:text="@string/menu_settings"
                 android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="@color/nav_text_tint" />
+                android:textColor="?attr/colorOnSurface" />
         </LinearLayout>
     </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

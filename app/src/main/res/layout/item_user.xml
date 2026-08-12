@@ -44,6 +44,6 @@
             android:contentDescription="@string/delete_user"
             android:padding="12dp"
             android:src="@drawable/ic_delete"
-            app:tint="@color/error" />
+            app:tint="?attr/colorError" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -32,11 +32,11 @@ class ExperimentalThemesActivity : BaseActivity() {
         }
 
         options.forEach { (id, name, desc) ->
-            container.addView(buildOption(id, name, desc, selected = id == current))
+            container.addView(buildOption(id, name, desc, selected = id == current, current = current))
         }
     }
 
-    private fun buildOption(id: String?, name: String, desc: String, selected: Boolean): MaterialCardView {
+    private fun buildOption(id: String?, name: String, desc: String, selected: Boolean, current: String): MaterialCardView {
         val card = MaterialCardView(this)
         card.layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -80,8 +80,10 @@ class ExperimentalThemesActivity : BaseActivity() {
         card.addView(row)
 
         card.setOnClickListener {
-            VpnPrefs.setExperimentalTheme(this, id.orEmpty())
-            recreate()
+            if (id.orEmpty() != current) {
+                VpnPrefs.setExperimentalTheme(this, id.orEmpty())
+                restartApp()
+            }
         }
         return card
     }

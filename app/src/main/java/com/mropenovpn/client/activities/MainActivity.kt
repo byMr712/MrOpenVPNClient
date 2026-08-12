@@ -162,6 +162,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         if (themeId.isEmpty()) return
         val density = resources.displayMetrics.density
         val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.connectBigButton)
+        val card = findViewById<com.google.android.material.card.MaterialCardView>(R.id.statusCard)
         when (themeId) {
             "neon" -> {
                 val lp = button.layoutParams
@@ -171,16 +172,47 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
                     .setAllCornerSizes(0f)
                     .build()
+                card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes(0f)
+                    .build()
             }
             "oled" -> {
                 button.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 button.strokeColor = ColorStateList.valueOf(Color.WHITE)
                 button.strokeWidth = (2 * density).toInt()
                 button.setTextColor(Color.WHITE)
+                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes(1000f)
+                    .build()
+                card.setCardBackgroundColor(ColorStateList.valueOf(Color.TRANSPARENT))
+                card.strokeWidth = (1 * density).toInt()
+                card.setStrokeColor(ColorStateList.valueOf(Color.WHITE))
+                card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes(0f)
+                    .build()
             }
             "redline" -> {
                 button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
                     .setAllCornerSizes((6 * density))
+                    .build()
+                card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes((4 * density))
+                    .build()
+            }
+            "paper" -> {
+                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes((24 * density))
+                    .build()
+                card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes((28 * density))
+                    .build()
+            }
+            "mint" -> {
+                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes((button.height / 2).toFloat())
+                    .build()
+                card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes((28 * density))
                     .build()
             }
         }
@@ -312,8 +344,15 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             else -> getString(R.string.state_disconnected)
         }
         statusLevelText.setTextColor(
-            ContextCompat.getColor(this, if (error) R.color.error else R.color.primary)
+            themeColor(if (error) com.google.android.material.R.attr.colorError else com.google.android.material.R.attr.colorPrimary)
         )
+    }
+
+    private fun themeColor(attr: Int): Int {
+        val ta = obtainStyledAttributes(intArrayOf(attr))
+        val color = ta.getColor(0, Color.BLACK)
+        ta.recycle()
+        return color
     }
 
     override fun setConnectedVPN(uuid: String?) {
@@ -503,7 +542,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         statusLevelText.text = getString(
             if (active) R.string.state_connected else R.string.state_disconnected
         )
-        statusLevelText.setTextColor(ContextCompat.getColor(this, R.color.primary))
+        statusLevelText.setTextColor(themeColor(com.google.android.material.R.attr.colorPrimary))
         updateConnectButton()
     }
 

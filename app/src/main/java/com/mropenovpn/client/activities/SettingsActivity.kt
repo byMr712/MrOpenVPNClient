@@ -63,7 +63,7 @@ class SettingsActivity : BaseActivity() {
                         if (checked) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_YES
                     )
                     updateThemeSummary(themeSummary, checked)
-                    recreate()
+                    restartApp()
                 }
             } else {
                 VpnPrefs.setLightTheme(this, checked)

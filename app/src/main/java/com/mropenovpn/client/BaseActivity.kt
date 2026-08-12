@@ -1,6 +1,7 @@
 package com.mropenovpn.client
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -22,5 +23,12 @@ open class BaseActivity : AppCompatActivity() {
             if (themeRes != 0) setTheme(themeRes)
         }
         super.onCreate(savedInstanceState)
+    }
+
+    protected fun restartApp() {
+        val intent = packageManager.getLaunchIntentForPackage(packageName) ?: return
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+        Runtime.getRuntime().exit(0)
     }
 }

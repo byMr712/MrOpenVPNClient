@@ -33,6 +33,6 @@
         android:gravity="center"
         android:text="@string/source_code"
         android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:textColor="@color/primary"
+        android:textColor="?attr/colorPrimary"
         android:textStyle="bold" />
 </LinearLayout>
