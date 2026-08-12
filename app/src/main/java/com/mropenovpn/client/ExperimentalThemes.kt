@@ -23,7 +23,8 @@ object ExperimentalThemes {
         val id: String,
         val nameRes: Int,
         val descRes: Int,
-        val styleRes: Int
+        val styleRes: Int,
+        val accentHex: String
     )
 
     data class AccentDef(
@@ -40,36 +41,43 @@ object ExperimentalThemes {
         AccentDef("#00897B", R.style.AppThemeOverlay_Accent_Teal)
     )
 
+    const val defaultAccentHex = "#1976D2"
+
     val themes = listOf(
         ThemeDef(
             id = "neon",
             nameRes = R.string.theme_neon_name,
             descRes = R.string.theme_neon_desc,
-            styleRes = R.style.Theme_MrOpenVPNClient_Neon
+            styleRes = R.style.Theme_MrOpenVPNClient_Neon,
+            accentHex = "#00E5FF"
         ),
         ThemeDef(
             id = "oled",
             nameRes = R.string.theme_oled_name,
             descRes = R.string.theme_oled_desc,
-            styleRes = R.style.Theme_MrOpenVPNClient_Oled
+            styleRes = R.style.Theme_MrOpenVPNClient_Oled,
+            accentHex = "#FFFFFF"
         ),
         ThemeDef(
             id = "paper",
             nameRes = R.string.theme_paper_name,
             descRes = R.string.theme_paper_desc,
-            styleRes = R.style.Theme_MrOpenVPNClient_Paper
+            styleRes = R.style.Theme_MrOpenVPNClient_Paper,
+            accentHex = "#22355E"
         ),
         ThemeDef(
             id = "redline",
             nameRes = R.string.theme_redline_name,
             descRes = R.string.theme_redline_desc,
-            styleRes = R.style.Theme_MrOpenVPNClient_Redline
+            styleRes = R.style.Theme_MrOpenVPNClient_Redline,
+            accentHex = "#FF453A"
         ),
         ThemeDef(
             id = "mint",
             nameRes = R.string.theme_mint_name,
             descRes = R.string.theme_mint_desc,
-            styleRes = R.style.Theme_MrOpenVPNClient_Mint
+            styleRes = R.style.Theme_MrOpenVPNClient_Mint,
+            accentHex = "#00A67D"
         )
     )
 

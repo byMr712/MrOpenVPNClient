@@ -308,6 +308,12 @@ class ExperimentalThemesActivity : BaseActivity() {
         card.setOnClickListener {
             val themeId = id.orEmpty()
             if (themeId != current) {
+                val accentHex = when (themeId) {
+                    "default_black", "default_white" -> ExperimentalThemes.defaultAccentHex
+                    else -> ExperimentalThemes.themes.firstOrNull { it.id == themeId }?.accentHex
+                        ?: ExperimentalThemes.defaultAccentHex
+                }
+                VpnPrefs.setAccentColor(this, accentHex)
                 when (themeId) {
                     "default_black" -> {
                         VpnPrefs.setExperimentalTheme(this, "")
