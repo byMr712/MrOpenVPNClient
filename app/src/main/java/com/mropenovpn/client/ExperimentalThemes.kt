@@ -1,5 +1,6 @@
 package com.mropenovpn.client
 
+import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -7,10 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RadioButton
+import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 
 object ExperimentalThemes {
 
@@ -102,23 +106,65 @@ object ExperimentalThemes {
 
     fun applyAccentOverlay(activity: AppCompatActivity, hex: String) {
         val accent = parseColor(hex) ?: return
-        val root = activity.window.decorView
+        tintViewTree(activity.window.decorView, accent)
+    }
 
-        val ta = activity.theme.obtainStyledAttributes(
-            intArrayOf(com.google.android.material.R.attr.colorPrimary)
+    fun applyAccentOverlay(root: View, hex: String) {
+        val accent = parseColor(hex) ?: return
+        tintViewTree(root, accent)
+    }
+
+    fun applyAccentToDialog(dialog: Dialog) {
+        val hex = VpnPrefs.accentColor(dialog.context)
+        if (hex.isEmpty()) return
+        val accent = parseColor(hex) ?: return
+        dialog.window?.decorView?.let { tintViewTree(it, accent) }
+    }
+
+    private fun tintViewTree(root: View, accent: Int) {
+        val ta = root.context.theme.obtainStyledAttributes(
+            intArrayOf(
+                com.google.android.material.R.attr.colorPrimary,
+                com.google.android.material.R.attr.colorOnSurface
+            )
         )
         val primary = ta.getColor(0, Color.BLACK)
+        val onSurface = ta.getColor(1, Color.DKGRAY)
         ta.recycle()
+
+        val onAccent = if (Color.luminance(accent) > 0.5f) Color.BLACK else Color.WHITE
+        val uncheckedTrack = (onSurface and 0x00FFFFFF) or 0x33000000.toInt()
 
         fun tint(view: View) {
             when (view) {
                 is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
-                is TextView -> if (view !is Button && view.currentTextColor == primary) {
+                is EditText -> view.backgroundTintList = ColorStateList.valueOf(accent)
+                is TextView -> if (view.currentTextColor == primary) {
                     view.setTextColor(accent)
                 }
                 is CheckBox -> view.buttonTintList = ColorStateList.valueOf(accent)
                 is RadioButton -> view.buttonTintList = ColorStateList.valueOf(accent)
                 is ImageView -> view.imageTintList = ColorStateList.valueOf(accent)
+                is SwitchCompat -> {
+                    view.trackTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(accent, uncheckedTrack)
+                    )
+                    view.thumbTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(onAccent, onSurface)
+                    )
+                }
+                is Switch -> {
+                    view.trackTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(accent, uncheckedTrack)
+                    )
+                    view.thumbTintList = ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                        intArrayOf(onAccent, onSurface)
+                    )
+                }
             }
             if (view is ViewGroup) {
                 for (i in 0 until view.childCount) tint(view.getChildAt(i))

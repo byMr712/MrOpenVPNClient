@@ -43,15 +43,15 @@ class ProfileAdapter(
 
         fun bind(profile: VpnProfile) {
             nameText.text = profile.mName
-            nameText.isClickable = true
-            nameText.setOnClickListener { onSelectUser(profile) }
+            itemView.setOnClickListener { onSelectUser(profile) }
             if (profile.mUsername.isNotEmpty()) {
                 userText.text = profile.mUsername
                 userText.visibility = View.VISIBLE
             } else {
                 userText.visibility = View.GONE
             }
-            val active = VpnStatus.isVPNActive()
+            val active = VpnStatus.isVPNActive() &&
+                profile.uuid.toString() == VpnStatus.getLastConnectedVPNProfile()
             connectButton.text = itemView.context.getString(
                 if (active) R.string.disconnect else R.string.connect
             )

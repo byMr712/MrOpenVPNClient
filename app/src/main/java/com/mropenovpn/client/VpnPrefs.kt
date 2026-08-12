@@ -8,7 +8,6 @@ object VpnPrefs {
     private const val KEY_AUTO_CONNECT = "auto_connect"
 
     private const val KEY_SCREENOFF = "screenoff"
-    private const val KEY_IGNORE_NET_STATE = "ignorenetstate"
     private const val KEY_NET_CHANGE_RECONNECT = "netchangereconnect"
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DEBUG_MODE = "debug_mode"
@@ -122,13 +121,6 @@ object VpnPrefs {
 
     fun setScreenOffPause(context: Context, value: Boolean) {
         vpnPrefs(context).edit().putBoolean(KEY_SCREENOFF, value).apply()
-    }
-
-    fun ignoreNetState(context: Context): Boolean =
-        vpnPrefs(context).getBoolean(KEY_IGNORE_NET_STATE, false)
-
-    fun setIgnoreNetState(context: Context, value: Boolean) {
-        vpnPrefs(context).edit().putBoolean(KEY_IGNORE_NET_STATE, value).apply()
     }
 
     fun netChangeReconnect(context: Context): Boolean =

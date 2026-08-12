@@ -10,8 +10,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.mropenovpn.client.BaseActivity
+import com.mropenovpn.client.ExperimentalThemes
 import com.mropenovpn.client.R
 import com.mropenovpn.client.VpnUsers
+import de.blinkt.openvpn.core.ProfileManager
 import de.blinkt.openvpn.core.VpnStatus
 
 class UsersActivity : BaseActivity() {
@@ -79,6 +81,7 @@ class UsersActivity : BaseActivity() {
             }
             .setNegativeButton(R.string.close, null)
             .show()
+            .also { ExperimentalThemes.applyAccentToDialog(it) }
     }
 
     private fun confirmDelete(login: String) {
@@ -87,10 +90,28 @@ class UsersActivity : BaseActivity() {
             .setMessage(getString(R.string.delete_user_confirm, login))
             .setPositiveButton(R.string.delete) { _, _ ->
                 VpnUsers.delete(this, login)
+                clearDeletedUserFromProfiles(login)
                 VpnStatus.logInfo(R.string.user_deleted, login)
                 renderUsers()
             }
             .setNegativeButton(R.string.close, null)
             .show()
+            .also { ExperimentalThemes.applyAccentToDialog(it) }
+    }
+
+    private fun clearDeletedUserFromProfiles(login: String) {
+        val pm = ProfileManager.getInstance(this)
+        var changed = false
+        for (profile in pm.getProfiles()) {
+            if (profile.mUsername == login) {
+                profile.mUsername = ""
+                profile.mPassword = ""
+                ProfileManager.saveProfile(this, profile)
+                changed = true
+            }
+        }
+        if (changed) {
+            VpnStatus.logInfo(R.string.user_detached_from_profiles, login)
+        }
     }
 }

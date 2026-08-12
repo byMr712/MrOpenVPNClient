@@ -603,7 +603,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mIsUserDisconnect = false;
-        mForegroundStarted = false;
+        if (mProcessThread == null)
+            mForegroundStarted = false;
         if (intent != null && intent.getBooleanExtra(ALWAYS_SHOW_NOTIFICATION, false))
             mNotificationAlwaysVisible = true;
 
@@ -644,9 +645,15 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         // Always show notification here to avoid problem with startForeground timeout
         VpnStatus.logInfo(R.string.building_configration);
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M  || (!foregroundNotificationVisible())) {
+        if (mShowNotification && (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || (!foregroundNotificationVisible()))) {
 
             VpnStatus.updateStateString("VPN_GENERATE_CONFIG", "", R.string.building_configration, ConnectionStatus.LEVEL_START);
+            showNotification(VpnStatus.getLastCleanLogMessage(this),
+                    VpnStatus.getLastCleanLogMessage(this), NOTIFICATION_CHANNEL_NEWSTATUS_ID, 0, ConnectionStatus.LEVEL_START, null);
+        } else if (!mShowNotification) {
+            // Notifications are disabled by the user. The service is still started
+            // via startForegroundService(), so startForeground() must be called to
+            // avoid an ANR, but the notification is removed again immediately.
             showNotification(VpnStatus.getLastCleanLogMessage(this),
                     VpnStatus.getLastCleanLogMessage(this), NOTIFICATION_CHANNEL_NEWSTATUS_ID, 0, ConnectionStatus.LEVEL_START, null);
         }

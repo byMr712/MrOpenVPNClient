@@ -8,18 +8,4 @@
         android:id="@+id/nav_users"
         android:icon="@drawable/ic_menu_users"
         android:title="@string/menu_users" />
-    <item
-        android:id="@+id/nav_language"
-        android:title="@string/menu_language">
-        <menu>
-            <item
-                android:id="@+id/nav_lang_en"
-                android:checkable="true"
-                android:title="@string/language_en" />
-            <item
-                android:id="@+id/nav_lang_ru"
-                android:checkable="true"
-                android:title="@string/language_ru" />
-        </menu>
-    </item>
 </menu>

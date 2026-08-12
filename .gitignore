@@ -26,4 +26,4 @@ captures/
 *.apk
 
 # Local debug log copied from the device
-logs.txt
+logs*.txt

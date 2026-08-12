@@ -10,6 +10,12 @@
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/onSurface</item>
+        <item name="colorOnSurfaceVariant">@color/onSurfaceVariant</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textColorTertiary">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textColorHint">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textColorLink">?attr/colorPrimary</item>
         <item name="colorError">@color/error</item>
         <item name="colorSurfaceContainer">@color/surfaceContainer</item>
         <item name="colorSurfaceContainerHighest">@color/surfaceContainerHigh</item>

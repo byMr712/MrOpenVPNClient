@@ -1,6 +1,7 @@
 package com.mropenovpn.client.activities
 
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.net.VpnService
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
@@ -83,14 +84,14 @@ abstract class VpnTileBase(private val slot: Int) : TileService(), VpnStatus.Sta
     private fun updateTile() {
         val tile = qsTile ?: return
         val profile = VpnTileManager.profileForSlot(this, slot)
+        tile.icon = Icon.createWithResource(this, R.drawable.ic_tile_mr)
+        tile.label = getString(R.string.tile_label)
         if (profile == null) {
             tile.state = Tile.STATE_UNAVAILABLE
-            tile.label = getString(R.string.tile_no_profile_slot)
         } else {
             val connectedUuid = VpnStatus.getLastConnectedVPNProfile()
             val active = VpnStatus.isVPNActive() && connectedUuid == profile.uuid.toString()
             tile.state = if (active) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-            tile.label = profile.mName
         }
         tile.updateTile()
     }

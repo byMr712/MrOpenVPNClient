@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.StateListDrawable
 import android.net.Uri
 import android.net.VpnService
 import android.os.Build
@@ -165,12 +167,12 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 card.strokeWidth = (1 * density).toInt()
                 card.setStrokeColor(ColorStateList.valueOf(Color.WHITE))
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes(0f)
+                    .setAllCornerSizes((16 * density))
                     .build()
             }
             "redline" -> {
                 card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-                    .setAllCornerSizes((4 * density))
+                    .setAllCornerSizes((16 * density))
                     .build()
             }
             "paper" -> {
@@ -189,11 +191,18 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
     private fun setupDrawer() {
         drawerLayout = findViewById(R.id.drawerLayout)
         val navView = findViewById<NavigationView>(R.id.navView)
-        navView.setCheckedItem(R.id.nav_profiles)
+        applyNavAccent(navView)
 
         val currentLang = VpnPrefs.language(this)
-        navView.menu.findItem(R.id.nav_lang_en).isChecked = currentLang != "ru"
-        navView.menu.findItem(R.id.nav_lang_ru).isChecked = currentLang == "ru"
+        val languageEntryText = findViewById<TextView>(R.id.languageEntryText)
+        languageEntryText.text = if (currentLang == "ru") getString(R.string.language_ru)
+        else getString(R.string.language_en)
+
+        findViewById<View>(R.id.languageEntry).setOnClickListener {
+            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
+            val next = if (VpnPrefs.language(this) == "ru") "en" else "ru"
+            setAppLanguage(next)
+        }
 
         findViewById<android.widget.ImageButton>(R.id.menuButton).setOnClickListener {
             drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
@@ -216,14 +225,6 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                     drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
                     startActivity(Intent(this, UsersActivity::class.java))
                 }
-                R.id.nav_lang_en -> {
-                    drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
-                    setAppLanguage("en")
-                }
-                R.id.nav_lang_ru -> {
-                    drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
-                    setAppLanguage("ru")
-                }
             }
             true
         }
@@ -232,6 +233,27 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
     private fun setAppLanguage(tag: String) {
         VpnPrefs.setLanguage(this, tag)
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+    }
+
+    private fun applyNavAccent(navView: NavigationView) {
+        val accent = ExperimentalThemes.accentOrDefaultColor(
+            this,
+            themeColor(com.google.android.material.R.attr.colorPrimary)
+        )
+
+        val itemBackground = StateListDrawable().apply {
+            addState(
+                intArrayOf(android.R.attr.state_pressed),
+                ColorDrawable(0x33FFFFFF and (accent and 0x00FFFFFF))
+            )
+            addState(intArrayOf(), ColorDrawable(Color.TRANSPARENT))
+        }
+        navView.itemBackground = itemBackground
+
+        val onSurface = themeColor(com.google.android.material.R.attr.colorOnSurface)
+        val color = ColorStateList.valueOf(onSurface)
+        navView.itemTextColor = color
+        navView.itemIconTintList = color
     }
 
     private fun autoConnectIfEnabled() {
@@ -262,6 +284,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             .setView(view)
             .setPositiveButton(R.string.close, null)
             .show()
+            .also { ExperimentalThemes.applyAccentToDialog(it) }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -409,7 +432,38 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         view.findViewById<Button>(R.id.pickAddUserButton).setOnClickListener {
             showAddUserAndSelect(profile) { dialog.dismiss() }
         }
+        view.findViewById<Button>(R.id.pickRenameButton).setOnClickListener {
+            showRenameDialog(profile) { dialog.dismiss() }
+        }
         dialog.show()
+        ExperimentalThemes.applyAccentToDialog(dialog)
+    }
+
+    private fun showRenameDialog(profile: VpnProfile, onDone: () -> Unit) {
+        val input = EditText(this).apply {
+            setText(profile.mName)
+            setSingleLine(true)
+            setSelectAllOnFocus(true)
+            setPadding(24, 12, 24, 12)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.rename_profile)
+            .setView(input)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val newName = input.text.toString().trim()
+                if (newName.isEmpty() || newName == profile.mName) {
+                    onDone()
+                } else {
+                    profile.mName = uniqueName(newName)
+                    ProfileManager.saveProfile(this, profile)
+                    VpnStatus.logInfo(R.string.profile_renamed, profile.mName)
+                    refreshProfileList()
+                    onDone()
+                }
+            }
+            .setNegativeButton(R.string.close, null)
+            .show()
+            .also { ExperimentalThemes.applyAccentToDialog(it) }
     }
 
     private fun selectUserForProfile(profile: VpnProfile, login: String) {
@@ -439,6 +493,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             }
             .setNegativeButton(R.string.close, null)
             .show()
+            .also { ExperimentalThemes.applyAccentToDialog(it) }
     }
 
     private fun showCredentialsDialog(profile: VpnProfile) {
@@ -500,6 +555,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             }
             .setNegativeButton(R.string.close, null)
             .show()
+            .also { ExperimentalThemes.applyAccentToDialog(it) }
     }
 
     private fun copyLogToClipboard() {

@@ -15,6 +15,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 
 import de.blinkt.openvpn.R;
 import de.blinkt.openvpn.core.VpnStatus.ByteCountListener;
@@ -34,6 +35,13 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
 
     // Time to wait after network disconnect to pause the VPN
     private final int DISCONNECT_WAIT = 20;
+
+    // Debounce for bursts of NetworkCallback events during network transitions
+    // (e.g. Wi-Fi <-> cellular handover). Prevents a storm of reconnect signals.
+    private static final long NETWORK_ACTION_COOLDOWN_MS = 1500;
+    private long mLastNetworkActionTime = 0;
+    private long mLastNetworkActionId = 0;
+    private boolean mNetworkRecheckScheduled = false;
 
     connectState network = connectState.DISCONNECTED;
     connectState screen = connectState.SHOULDBECONNECTED;
@@ -90,8 +98,8 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
      * Registers a NetworkCallback that reliably detects changes of the
      * underlying (non-VPN) network. The legacy CONNECTIVITY_ACTION broadcast
      * is no longer delivered reliably on modern Android versions, so without
-     * this the "Reconnect on network change" / "Ignore network state"
-     * settings would never react to a network change.
+     * this the "Reconnect on network change"
+     * setting would never react to a network change.
      */
     public void startNetworkMonitoring(Context context) {
         mContext = context;
@@ -249,11 +257,7 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
 
     public void networkStateChange(Context context) {
         SharedPreferences prefs = Preferences.getDefaultSharedPreferences(context);
-        boolean ignoreNetworkState = prefs.getBoolean("ignorenetstate", false);
-        if (ignoreNetworkState) {
-            network = connectState.SHOULDBECONNECTED;
-            return;
-        }
+        boolean reconnectOnChange = prefs.getBoolean("netchangereconnect", true);
 
         if (mConnMan == null)
             mConnMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -270,41 +274,62 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
             netstatestring = "not connected";
         }
 
-        boolean sendusr1 = prefs.getBoolean("netchangereconnect", true);
-
         if (usableNetwork) {
             long newnet = physicalNetwork.getNetworkHandle();
             boolean pendingDisconnect = (network == connectState.PENDINGDISCONNECT);
             network = connectState.SHOULDBECONNECTED;
 
             boolean sameNetwork = (lastConnectedNetwork != 0 && lastConnectedNetwork == newnet);
+            boolean actionTaken = false;
 
-            if (pendingDisconnect && sameNetwork) {
-                /* Same network, connection still 'established' */
-                mDisconnectHandler.removeCallbacks(mDelayDisconnectRunnable);
-                // Reprotect the sockets just be sure
-                mManagement.networkChange(true);
-            } else {
-                /* Different network or connection not established anymore */
-
-                if (screen == connectState.PENDINGDISCONNECT)
-                    screen = connectState.DISCONNECTED;
-
-                if (shouldBeConnected()) {
+            if (reconnectOnChange) {
+                if (pendingDisconnect && sameNetwork) {
+                    /* Same network, connection still 'established' */
                     mDisconnectHandler.removeCallbacks(mDelayDisconnectRunnable);
+                    // Reprotect the sockets just be sure
+                    mManagement.networkChange(true);
+                    actionTaken = true;
+                } else {
+                    /* Different network or connection not established anymore */
 
-                    if (pendingDisconnect || !sameNetwork)
-                        mManagement.networkChange(sameNetwork);
-                    else
-                        mManagement.resume();
+                    if (screen == connectState.PENDINGDISCONNECT)
+                        screen = connectState.DISCONNECTED;
+
+                    if (shouldBeConnected()) {
+                        // During a burst of NetworkCallback events (Wi-Fi <-> cellular
+                        // handover) skip redundant commands and let openvpn recover
+                        // once the network settles.
+                        if (!pendingDisconnect && isNetworkActionDebounced()) {
+                            VpnStatus.logDebug("Network change debounced (network " + newnet + ")");
+                            scheduleNetworkRecheck();
+                        } else {
+                            mDisconnectHandler.removeCallbacks(mDelayDisconnectRunnable);
+
+                            if (pendingDisconnect || !sameNetwork)
+                                mManagement.networkChange(sameNetwork);
+                            else
+                                mManagement.resume();
+                            actionTaken = true;
+                        }
+                    }
                 }
+            } else if (pendingDisconnect) {
+                /* Reconnect disabled: keep the tunnel running, only re-connect
+                 * if it was paused while waiting for a network. */
+                mDisconnectHandler.removeCallbacks(mDelayDisconnectRunnable);
+                mManagement.resume();
+                actionTaken = true;
             }
 
+            if (actionTaken) {
+                mLastNetworkActionTime = SystemClock.elapsedRealtime();
+                mLastNetworkActionId = newnet;
+            }
             lastConnectedNetwork = newnet;
         } else {
             // Not connected, stop openvpn, set last connected network to no network
             lastConnectedNetwork = 0;
-            if (sendusr1) {
+            if (reconnectOnChange) {
                 network = connectState.PENDINGDISCONNECT;
                 mDisconnectHandler.postDelayed(mDelayDisconnectRunnable, DISCONNECT_WAIT * 1000);
             }
@@ -317,6 +342,29 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
                 netstatestring, getPauseReason(), shouldBeConnected(), network));
         lastStateMsg = netstatestring;
 
+    }
+
+    private boolean isNetworkActionDebounced() {
+        long now = SystemClock.elapsedRealtime();
+        if ((now - mLastNetworkActionTime) >= NETWORK_ACTION_COOLDOWN_MS)
+            return false;
+        // Still inside the cooldown window: suppress further commands even if
+        // the network flips back and forth (Wi-Fi <-> cellular handover).
+        return true;
+    }
+
+    private void scheduleNetworkRecheck() {
+        if (mNetworkRecheckScheduled)
+            return;
+        mNetworkRecheckScheduled = true;
+        mDisconnectHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mNetworkRecheckScheduled = false;
+                if (mManagement != null)
+                    networkStateChange(mContext);
+            }
+        }, NETWORK_ACTION_COOLDOWN_MS);
     }
 
     /**

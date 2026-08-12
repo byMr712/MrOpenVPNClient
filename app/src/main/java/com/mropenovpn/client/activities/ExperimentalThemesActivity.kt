@@ -14,6 +14,7 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.radiobutton.MaterialRadioButton
 import com.mropenovpn.client.BaseActivity
@@ -31,10 +32,14 @@ class ExperimentalThemesActivity : BaseActivity() {
         findViewById<ImageButton>(R.id.backButton).setOnClickListener { finish() }
 
         val container = findViewById<LinearLayout>(R.id.optionsContainer)
-        val current = VpnPrefs.experimentalTheme(this)
+        val currentTheme = VpnPrefs.experimentalTheme(this)
+        val current = if (currentTheme.isEmpty()) {
+            if (VpnPrefs.isLightTheme(this)) "default_white" else "default_black"
+        } else currentTheme
 
         val options = buildList {
-            add(Triple<String?, String, String>("", getString(R.string.experimental_default), getString(R.string.experimental_default_desc)))
+            add(Triple<String?, String, String>("default_black", getString(R.string.theme_default_black), getString(R.string.theme_default_black_desc)))
+            add(Triple<String?, String, String>("default_white", getString(R.string.theme_default_white), getString(R.string.theme_default_white_desc)))
             ExperimentalThemes.themes.forEach { theme ->
                 add(Triple(theme.id, getString(theme.nameRes), getString(theme.descRes)))
             }
@@ -122,7 +127,7 @@ class ExperimentalThemesActivity : BaseActivity() {
                 InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
             setText(currentHex)
             setTextColor(themeColor())
-            setHintTextColor(0x66000000.toInt())
+            setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(themeColor(), 0x66))
             layoutParams = LinearLayout.LayoutParams(
                 0,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -301,8 +306,21 @@ class ExperimentalThemesActivity : BaseActivity() {
         card.addView(row)
 
         card.setOnClickListener {
-            if (id.orEmpty() != current) {
-                VpnPrefs.setExperimentalTheme(this, id.orEmpty())
+            val themeId = id.orEmpty()
+            if (themeId != current) {
+                when (themeId) {
+                    "default_black" -> {
+                        VpnPrefs.setExperimentalTheme(this, "")
+                        VpnPrefs.setLightTheme(this, false)
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    }
+                    "default_white" -> {
+                        VpnPrefs.setExperimentalTheme(this, "")
+                        VpnPrefs.setLightTheme(this, true)
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    }
+                    else -> VpnPrefs.setExperimentalTheme(this, themeId)
+                }
                 restartApp()
             }
         }

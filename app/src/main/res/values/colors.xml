@@ -11,6 +11,7 @@
     <color name="surfaceContainer">#F3F3F3</color>
     <color name="surfaceContainerHigh">#E7E7E7</color>
     <color name="onSurface">#1A1C1E</color>
+    <color name="onSurfaceVariant">#49454F</color>
     <color name="outline">#74777F</color>
     <color name="error">#BA1A1A</color>
 
