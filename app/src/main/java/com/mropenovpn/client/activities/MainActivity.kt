@@ -5,12 +5,15 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -20,12 +23,15 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
+import com.mropenovpn.client.BaseActivity
+import com.mropenovpn.client.ExperimentalThemes
 import com.mropenovpn.client.R
 import com.mropenovpn.client.VpnPrefs
 import com.mropenovpn.client.VpnTileManager
@@ -41,10 +47,9 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 
-class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
+class MainActivity : BaseActivity(), VpnStatus.StateListener {
 
     private lateinit var statusLevelText: TextView
-    private lateinit var statusMessageText: TextView
     private lateinit var profileList: RecyclerView
     private lateinit var adapter: ProfileAdapter
     private lateinit var drawerLayout: DrawerLayout
@@ -77,7 +82,6 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
         setContentView(R.layout.activity_main)
 
         statusLevelText = findViewById(R.id.statusLevelText)
-        statusMessageText = findViewById(R.id.statusMessageText)
         profileList = findViewById(R.id.profileList)
 
         adapter = ProfileAdapter(
@@ -87,7 +91,7 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
         profileList.layoutManager = LinearLayoutManager(this)
         profileList.adapter = adapter
 
-        findViewById<Button>(R.id.importButton).setOnClickListener {
+        findViewById<Button>(R.id.addProfileButton).setOnClickListener {
             openDocument.launch(arrayOf("*/*"))
         }
 
@@ -95,12 +99,19 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
             copyLogToClipboard()
         }
 
+        findViewById<Button>(R.id.connectBigButton).setOnClickListener {
+            onBigConnectClick()
+        }
+
+        applyExperimentalTheme()
+
         OpenVPNService.setNotificationActivityClass(MainActivity::class.java)
 
         requestNotificationPermissionIfNeeded()
         refreshProfileList()
         VpnTileManager.sync(this)
-        updateStatusUi(VpnStatus.getLastCleanLogMessage(this))
+        updateStatusUi()
+        updateDebugUi()
 
         setupDrawer()
         autoConnectIfEnabled()
@@ -113,13 +124,84 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateDebugUi()
+        updateStatusUi()
+    }
+
+    private fun updateDebugUi() {
+        findViewById<Button>(R.id.copyLogButton).visibility =
+            if (VpnPrefs.debugMode(this)) View.VISIBLE else View.GONE
+    }
+
+    private fun updateConnectButton() {
+        findViewById<Button>(R.id.connectBigButton).text = getString(
+            if (VpnStatus.isVPNActive()) R.string.main_disconnect else R.string.main_connect
+        )
+    }
+
+    private fun onBigConnectClick() {
+        if (VpnStatus.isVPNActive()) {
+            disconnectCurrent()
+            return
+        }
+        val pm = ProfileManager.getInstance(this)
+        val profile = VpnPrefs.lastProfileUuid(this)?.let { uuid ->
+            pm.getProfiles().firstOrNull { it.uuid.toString() == uuid }
+        } ?: pm.getProfiles().firstOrNull()
+        if (profile == null) {
+            openDocument.launch(arrayOf("*/*"))
+        } else {
+            connectToProfile(profile)
+        }
+    }
+
+    private fun applyExperimentalTheme() {
+        val themeId = VpnPrefs.experimentalTheme(this)
+        if (themeId.isEmpty()) return
+        val density = resources.displayMetrics.density
+        val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.connectBigButton)
+        when (themeId) {
+            "neon" -> {
+                val lp = button.layoutParams
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT
+                lp.height = (60 * density).toInt()
+                button.layoutParams = lp
+                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes(0f)
+                    .build()
+            }
+            "oled" -> {
+                button.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                button.strokeColor = ColorStateList.valueOf(Color.WHITE)
+                button.strokeWidth = (2 * density).toInt()
+                button.setTextColor(Color.WHITE)
+            }
+            "redline" -> {
+                button.shapeAppearanceModel = button.shapeAppearanceModel.toBuilder()
+                    .setAllCornerSizes((6 * density))
+                    .build()
+            }
+        }
+    }
+
     private fun setupDrawer() {
         drawerLayout = findViewById(R.id.drawerLayout)
         val navView = findViewById<NavigationView>(R.id.navView)
         navView.setCheckedItem(R.id.nav_profiles)
 
+        val currentLang = VpnPrefs.language(this)
+        navView.menu.findItem(R.id.nav_lang_en).isChecked = currentLang != "ru"
+        navView.menu.findItem(R.id.nav_lang_ru).isChecked = currentLang == "ru"
+
         findViewById<android.widget.ImageButton>(R.id.menuButton).setOnClickListener {
             drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
+        }
+
+        findViewById<View>(R.id.settingsEntry).setOnClickListener {
+            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         navView.setNavigationItemSelectedListener { item ->
@@ -129,17 +211,26 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
                     drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
                     startActivity(Intent(this, UsersActivity::class.java))
                 }
-                R.id.nav_settings -> {
-                    drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
-                    startActivity(Intent(this, SettingsActivity::class.java))
-                }
                 R.id.nav_about -> {
                     drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
                     showAboutDialog()
                 }
+                R.id.nav_lang_en -> {
+                    drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
+                    setAppLanguage("en")
+                }
+                R.id.nav_lang_ru -> {
+                    drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
+                    setAppLanguage("ru")
+                }
             }
             true
         }
+    }
+
+    private fun setAppLanguage(tag: String) {
+        VpnPrefs.setLanguage(this, tag)
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
     }
 
     private fun autoConnectIfEnabled() {
@@ -157,9 +248,17 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
         val version = runCatching {
             packageManager.getPackageInfo(packageName, 0).versionName
         }.getOrNull() ?: "1.0"
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_about, null)
+        view.findViewById<TextView>(R.id.aboutTitle).text = getString(R.string.app_name)
+        view.findViewById<TextView>(R.id.aboutVersion).text =
+            getString(R.string.about_version, version)
+        view.findViewById<TextView>(R.id.aboutSource).setOnClickListener {
+            startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/byMr712/MrOpenVPNClient"))
+            )
+        }
         AlertDialog.Builder(this)
-            .setTitle(R.string.app_name)
-            .setMessage(getString(R.string.about_message, version))
+            .setView(view)
             .setPositiveButton(R.string.close, null)
             .show()
     }
@@ -193,29 +292,34 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
         intent: Intent?
     ) {
         runOnUiThread {
-            statusLevelText.text = when (level) {
-                ConnectionStatus.LEVEL_CONNECTED -> getString(R.string.state_connected)
-                ConnectionStatus.LEVEL_CONNECTING_SERVER_REPLIED ->
-                    getString(R.string.state_connecting_server_replied)
-                ConnectionStatus.LEVEL_CONNECTING_NO_SERVER_REPLY_YET ->
-                    getString(R.string.state_connecting)
-                ConnectionStatus.LEVEL_AUTH_FAILED -> getString(R.string.state_auth_failed)
-                ConnectionStatus.LEVEL_WAITING_FOR_USER_INPUT ->
-                    getString(R.string.state_waiting_input)
-                ConnectionStatus.LEVEL_NONETWORK -> getString(R.string.state_no_network)
-                ConnectionStatus.LEVEL_VPNPAUSED -> getString(R.string.state_paused)
-                ConnectionStatus.LEVEL_START -> getString(R.string.state_starting)
-                ConnectionStatus.LEVEL_NOTCONNECTED -> getString(R.string.state_disconnected)
-                else -> getString(R.string.state_disconnected)
-            }
-            statusMessageText.text = logmessage.ifBlank { VpnStatus.getLastCleanLogMessage(this) }
+            updateStatusLevel(level)
             adapter.notifyDataSetChanged()
         }
+    }
+
+    private fun updateStatusLevel(level: ConnectionStatus) {
+        val error = level == ConnectionStatus.LEVEL_AUTH_FAILED ||
+            level == ConnectionStatus.LEVEL_NONETWORK
+        val connecting = level == ConnectionStatus.LEVEL_CONNECTING_SERVER_REPLIED ||
+            level == ConnectionStatus.LEVEL_CONNECTING_NO_SERVER_REPLY_YET ||
+            level == ConnectionStatus.LEVEL_START ||
+            level == ConnectionStatus.LEVEL_WAITING_FOR_USER_INPUT ||
+            level == ConnectionStatus.LEVEL_VPNPAUSED
+        statusLevelText.text = when {
+            level == ConnectionStatus.LEVEL_CONNECTED -> getString(R.string.state_connected)
+            error -> getString(R.string.state_error)
+            connecting -> getString(R.string.state_connecting)
+            else -> getString(R.string.state_disconnected)
+        }
+        statusLevelText.setTextColor(
+            ContextCompat.getColor(this, if (error) R.color.error else R.color.primary)
+        )
     }
 
     override fun setConnectedVPN(uuid: String?) {
         runOnUiThread {
             refreshProfileList()
+            updateConnectButton()
         }
     }
 
@@ -394,11 +498,13 @@ class MainActivity : AppCompatActivity(), VpnStatus.StateListener {
         adapter.setProfiles(profiles)
     }
 
-    private fun updateStatusUi(message: String) {
-        statusLevelText.text =
-            if (VpnStatus.isVPNActive()) getString(R.string.state_connected)
-            else getString(R.string.state_disconnected)
-        statusMessageText.text = message
+    private fun updateStatusUi() {
+        val active = VpnStatus.isVPNActive()
+        statusLevelText.text = getString(
+            if (active) R.string.state_connected else R.string.state_disconnected
+        )
+        statusLevelText.setTextColor(ContextCompat.getColor(this, R.color.primary))
+        updateConnectButton()
     }
 
     private fun requestNotificationPermissionIfNeeded() {

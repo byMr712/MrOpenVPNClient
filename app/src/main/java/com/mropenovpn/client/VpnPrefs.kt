@@ -10,6 +10,68 @@ object VpnPrefs {
     private const val KEY_SCREENOFF = "screenoff"
     private const val KEY_IGNORE_NET_STATE = "ignorenetstate"
     private const val KEY_NET_CHANGE_RECONNECT = "netchangereconnect"
+    private const val KEY_LANGUAGE = "language"
+    private const val KEY_DEBUG_MODE = "debug_mode"
+    private const val KEY_LIGHT_THEME = "light_theme"
+    private const val KEY_NOTIFY = "notify"
+    private const val KEY_EXPERIMENTAL_THEME = "experimental_theme"
+
+    fun notifyEnabled(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getBoolean(KEY_NOTIFY, true)
+
+    fun setNotifyEnabled(context: Context, value: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_NOTIFY, value)
+            .apply()
+    }
+
+    fun experimentalTheme(context: Context): String =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getString(KEY_EXPERIMENTAL_THEME, "")
+            ?: ""
+
+    fun setExperimentalTheme(context: Context, id: String) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_EXPERIMENTAL_THEME, id)
+            .apply()
+    }
+
+    fun language(context: Context): String =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getString(KEY_LANGUAGE, "en")
+            ?: "en"
+
+    fun setLanguage(context: Context, tag: String) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_LANGUAGE, tag)
+            .apply()
+    }
+
+    fun debugMode(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getBoolean(KEY_DEBUG_MODE, false)
+
+    fun setDebugMode(context: Context, value: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_DEBUG_MODE, value)
+            .apply()
+    }
+
+    fun isLightTheme(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getBoolean(KEY_LIGHT_THEME, false)
+
+    fun setLightTheme(context: Context, value: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_LIGHT_THEME, value)
+            .apply()
+    }
 
     fun lastProfileUuid(context: Context): String? =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)

@@ -1,24 +1,78 @@
 package com.mropenovpn.client.activities
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.mropenovpn.client.BaseActivity
+import com.mropenovpn.client.ExperimentalThemes
 import com.mropenovpn.client.R
 import com.mropenovpn.client.VpnPrefs
 import com.mropenovpn.client.VpnUsers
+import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.VpnStatus
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
+
+    private var suppressThemeToggle = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
         findViewById<ImageButton>(R.id.backButton).setOnClickListener { finish() }
+
+        val swNotification = findViewById<MaterialSwitch>(R.id.swNotification)
+        swNotification.isChecked = VpnPrefs.notifyEnabled(this)
+        swNotification.setOnCheckedChangeListener { _, checked ->
+            VpnPrefs.setNotifyEnabled(this, checked)
+            OpenVPNService.setNotificationVisible(checked)
+        }
+
+        val experimentalEntry = findViewById<View>(R.id.experimentalEntry)
+        val swDebugMode = findViewById<MaterialSwitch>(R.id.swDebugMode)
+        swDebugMode.isChecked = VpnPrefs.debugMode(this)
+        swDebugMode.setOnCheckedChangeListener { _, checked ->
+            VpnPrefs.setDebugMode(this, checked)
+            updateDebugSectionVisibility(experimentalEntry, checked)
+        }
+        updateDebugSectionVisibility(experimentalEntry, VpnPrefs.debugMode(this))
+        experimentalEntry.setOnClickListener {
+            startActivity(Intent(this, ExperimentalThemesActivity::class.java))
+        }
+
+        val swLightTheme = findViewById<MaterialSwitch>(R.id.swLightTheme)
+        val themeSummary = findViewById<TextView>(R.id.themeSummaryText)
+        swLightTheme.isChecked = VpnPrefs.isLightTheme(this)
+        updateThemeSummary(themeSummary, swLightTheme.isChecked)
+        swLightTheme.setOnCheckedChangeListener { _, checked ->
+            if (suppressThemeToggle) return@setOnCheckedChangeListener
+            if (ExperimentalThemes.isExperimental(this)) {
+                suppressThemeToggle = true
+                swLightTheme.isChecked = !checked
+                suppressThemeToggle = false
+                confirmDisableExperimentalThemes {
+                    VpnPrefs.setExperimentalTheme(this, "")
+                    VpnPrefs.setLightTheme(this, checked)
+                    AppCompatDelegate.setDefaultNightMode(
+                        if (checked) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_YES
+                    )
+                    updateThemeSummary(themeSummary, checked)
+                    recreate()
+                }
+            } else {
+                VpnPrefs.setLightTheme(this, checked)
+                AppCompatDelegate.setDefaultNightMode(
+                    if (checked) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_YES
+                )
+                updateThemeSummary(themeSummary, checked)
+            }
+        }
 
         val swAutoConnect = findViewById<MaterialSwitch>(R.id.swAutoConnect)
         val swScreenOff = findViewById<MaterialSwitch>(R.id.swScreenOff)
@@ -64,5 +118,33 @@ class SettingsActivity : AppCompatActivity() {
                 ?.let { "${it.versionName} (${it.versionCode})" }
                 ?: "1.0 (1)"
         )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        suppressThemeToggle = true
+        val swLightTheme = findViewById<MaterialSwitch>(R.id.swLightTheme)
+        swLightTheme.isChecked = VpnPrefs.isLightTheme(this)
+        suppressThemeToggle = false
+    }
+
+    private fun updateDebugSectionVisibility(entry: View, enabled: Boolean) {
+        entry.visibility = if (enabled) View.VISIBLE else View.GONE
+    }
+
+    private fun updateThemeSummary(summary: TextView, light: Boolean) {
+        summary.text = getString(
+            R.string.settings_theme_summary,
+            getString(if (light) R.string.theme_light else R.string.theme_dark)
+        )
+    }
+
+    private fun confirmDisableExperimentalThemes(onAgree: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.theme_dialog_title)
+            .setMessage(R.string.theme_dialog_message)
+            .setPositiveButton(R.string.yes) { _, _ -> onAgree() }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 }

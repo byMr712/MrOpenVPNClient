@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.MrOpenVPNClient" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.MrOpenVPNClient" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/onPrimary</item>
         <item name="colorPrimaryContainer">@color/primaryContainer</item>
@@ -16,7 +16,7 @@
         <item name="colorOutline">@color/outline</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/background</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">@bool/status_bar_light_icons</item>
     </style>
 
     <style name="Theme.MrOpenVPNClient.NoDisplay" parent="Theme.MrOpenVPNClient">
@@ -25,5 +25,108 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="Theme.MrOpenVPNClient.Neon" parent="Theme.MrOpenVPNClient">
+        <item name="colorPrimary">#00E5FF</item>
+        <item name="colorOnPrimary">#00363D</item>
+        <item name="colorPrimaryContainer">#004F59</item>
+        <item name="colorOnPrimaryContainer">#B8F7FF</item>
+        <item name="colorSecondary">#FF2F92</item>
+        <item name="colorOnSecondary">#3E0021</item>
+        <item name="colorSecondaryContainer">#FFD9E8</item>
+        <item name="colorOnSecondaryContainer">#3E0021</item>
+        <item name="android:colorBackground">#06070A</item>
+        <item name="colorSurface">#06070A</item>
+        <item name="colorOnSurface">#E4EDF0</item>
+        <item name="colorSurfaceContainer">#11151A</item>
+        <item name="colorSurfaceContainerHighest">#1B2128</item>
+        <item name="colorOutline">#2E3A42</item>
+        <item name="colorError">#FFB4AB</item>
+        <item name="android:statusBarColor">#06070A</item>
+        <item name="android:navigationBarColor">#06070A</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.MrOpenVPNClient.Oled" parent="Theme.MrOpenVPNClient">
+        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorPrimaryContainer">#2A2A2A</item>
+        <item name="colorOnPrimaryContainer">#FFFFFF</item>
+        <item name="colorSecondary">#9E9E9E</item>
+        <item name="colorOnSecondary">#000000</item>
+        <item name="android:colorBackground">#000000</item>
+        <item name="colorSurface">#000000</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorSurfaceContainer">#101010</item>
+        <item name="colorSurfaceContainerHighest">#1A1A1A</item>
+        <item name="colorOutline">#333333</item>
+        <item name="colorError">#FFB4AB</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:navigationBarColor">#000000</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.MrOpenVPNClient.Paper" parent="Theme.MrOpenVPNClient">
+        <item name="colorPrimary">#22355E</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#DDE4F4</item>
+        <item name="colorOnPrimaryContainer">#101E3A</item>
+        <item name="colorSecondary">#6B5D3E</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#E9DFC4</item>
+        <item name="colorOnSecondaryContainer">#241A06</item>
+        <item name="android:colorBackground">#F5F0E6</item>
+        <item name="colorSurface">#F5F0E6</item>
+        <item name="colorOnSurface">#211F1A</item>
+        <item name="colorSurfaceContainer">#EEE7D8</item>
+        <item name="colorSurfaceContainerHighest">#E3DAC8</item>
+        <item name="colorOutline">#8A8375</item>
+        <item name="colorError">#BA1A1A</item>
+        <item name="android:statusBarColor">#F5F0E6</item>
+        <item name="android:navigationBarColor">#F5F0E6</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.MrOpenVPNClient.Redline" parent="Theme.MrOpenVPNClient">
+        <item name="colorPrimary">#FF453A</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#5C0000</item>
+        <item name="colorOnPrimaryContainer">#FFDAD6</item>
+        <item name="colorSecondary">#FFB300</item>
+        <item name="colorOnSecondary">#3F2F00</item>
+        <item name="colorSecondaryContainer">#FFE08A</item>
+        <item name="colorOnSecondaryContainer">#3F2F00</item>
+        <item name="android:colorBackground">#12090A</item>
+        <item name="colorSurface">#12090A</item>
+        <item name="colorOnSurface">#F2E2E0</item>
+        <item name="colorSurfaceContainer">#241718</item>
+        <item name="colorSurfaceContainerHighest">#312021</item>
+        <item name="colorOutline">#5C3B3B</item>
+        <item name="colorError">#FFB4AB</item>
+        <item name="android:statusBarColor">#12090A</item>
+        <item name="android:navigationBarColor">#12090A</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.MrOpenVPNClient.Mint" parent="Theme.MrOpenVPNClient">
+        <item name="colorPrimary">#00A67D</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#C0F7E0</item>
+        <item name="colorOnPrimaryContainer">#003828</item>
+        <item name="colorSecondary">#4F6668</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#D4E9EC</item>
+        <item name="colorOnSecondaryContainer">#0A1F22</item>
+        <item name="android:colorBackground">#F7FBF9</item>
+        <item name="colorSurface">#F7FBF9</item>
+        <item name="colorOnSurface">#171D1C</item>
+        <item name="colorSurfaceContainer">#EAF2EE</item>
+        <item name="colorSurfaceContainerHighest">#DDE8E2</item>
+        <item name="colorOutline">#707B77</item>
+        <item name="colorError">#BA1A1A</item>
+        <item name="android:statusBarColor">#F7FBF9</item>
+        <item name="android:navigationBarColor">#F7FBF9</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

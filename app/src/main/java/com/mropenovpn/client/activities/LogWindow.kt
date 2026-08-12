@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import com.mropenovpn.client.BaseActivity
 import com.mropenovpn.client.R
 import de.blinkt.openvpn.core.VpnStatus
 
-class LogWindow : AppCompatActivity() {
+class LogWindow : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

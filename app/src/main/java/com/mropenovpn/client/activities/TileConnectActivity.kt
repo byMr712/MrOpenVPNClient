@@ -5,13 +5,15 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import com.mropenovpn.client.BaseActivity
 import com.mropenovpn.client.VpnPrefs
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ProfileManager
 import de.blinkt.openvpn.core.VPNLaunchHelper
 
-class TileConnectActivity : AppCompatActivity() {
+class TileConnectActivity : BaseActivity() {
+
+    override val experimentalThemeEnabled: Boolean get() = false
 
     private var profile: VpnProfile? = null
 

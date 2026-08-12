@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notifcation_title">%1$s</string>
+    <string name="notifcation_title_notconnect">MrOpenVPN Client</string>
+    <string name="cancel_connection">Отключить</string>
+    <string name="cancel_connection_long">Отключить VPN</string>
+    <string name="pauseVPN">Пауза</string>
+    <string name="resumevpn">Продолжить</string>
+    <string name="permission_requested">Требуется разрешение</string>
+    <string name="openvpn_channel_name_error">Ошибка VPN</string>
+    <string name="openvpn_channel_description_error">Уведомления об ошибках VPN</string>
+    <string name="openvpn_notification_disconnected_error">Подключение прервано</string>
+</resources>

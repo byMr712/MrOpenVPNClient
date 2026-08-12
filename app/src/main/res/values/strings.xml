@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MrOpenVPN Client</string>
+    <string name="app_subtitle">VPN client</string>
+
+    <string name="menu_open">Open menu</string>
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="add_profile">Add profile</string>
     <string name="import_profile">Import .ovpn profile</string>
     <string name="profiles">Profiles</string>
     <string name="no_profiles">No profiles yet</string>
-    <string name="connect">Connect</string>
-    <string name="disconnect">Disconnect</string>
-    <string name="close">Close</string>
+
+    <string name="main_connect">Connect</string>
+    <string name="main_disconnect">Disconnect</string>
 
     <string name="status_no_connection_message">Not connected. Import a profile to get started.</string>
 
@@ -19,6 +32,7 @@
     <string name="state_waiting_input">Waiting for input</string>
     <string name="state_no_network">No network</string>
     <string name="state_paused">Paused</string>
+    <string name="state_error">Error</string>
 
     <string name="import_success">Profile imported: %1$s</string>
     <string name="import_error">Failed to import profile: %1$s</string>
@@ -26,6 +40,7 @@
     <string name="vpn_start_error">Could not start the VPN.</string>
     <string name="copy_log">Copy log</string>
     <string name="log_copied">%1$d log lines copied to clipboard</string>
+
     <string name="credentials_title">Enter VPN credentials</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
@@ -40,37 +55,67 @@
     <string name="tile_no_profiles">No profiles</string>
     <string name="tile_no_profile_slot">No VPN</string>
 
-    <string name="menu_open">Открыть меню</string>
-    <string name="back">Назад</string>
-    <string name="app_subtitle">VPN-клиент</string>
-    <string name="menu_profiles">Профили</string>
-    <string name="menu_users">Пользователи</string>
-    <string name="menu_settings">Настройки</string>
-    <string name="menu_about">О приложении</string>
-    <string name="about_message">MrOpenVPN Client\nВерсия: %1$s\n\nПростой VPN-клиент для подключения к серверу.</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_users">Users</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_about">About</string>
+    <string name="menu_language">Language</string>
+    <string name="language_en">English</string>
+    <string name="language_ru">Русский</string>
 
-    <string name="add_user">Добавить пользователя</string>
-    <string name="no_users">Пока нет сохранённых пользователей</string>
-    <string name="save">Сохранить</string>
-    <string name="delete">Удалить</string>
-    <string name="delete_user">Удалить пользователя</string>
-    <string name="delete_user_confirm">Удалить пользователя %1$s?</string>
-    <string name="user_has_password">пароль сохранён</string>
-    <string name="user_added">Пользователь %1$s добавлен</string>
-    <string name="user_deleted">Пользователь %1$s удалён</string>
-    <string name="users_cleared">Все сохранённые пользователи удалены</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="source_code">Source code</string>
 
-    <string name="settings_connection_section">Подключение</string>
-    <string name="settings_data_section">Данные</string>
-    <string name="settings_auto_connect">Автоподключение</string>
-    <string name="settings_auto_connect_summary">Подключаться к последнему профилю при запуске приложения</string>
-    <string name="settings_screen_off">Пауза при выключенном экране</string>
-    <string name="settings_screen_off_summary">Приостанавливать VPN, когда экран выключен</string>
-    <string name="settings_ignore_net_state">Игнорировать состояние сети</string>
-    <string name="settings_ignore_net_state_summary">Не реагировать на изменения сети</string>
-    <string name="settings_net_change_reconnect">Переподключаться при смене сети</string>
-    <string name="settings_net_change_reconnect_summary">Перезапускать соединение при потере сети</string>
-    <string name="clear_users">Удалить всех пользователей</string>
-    <string name="clear_users_confirm">Удалить все сохранённые логины и пароли?</string>
-    <string name="settings_version">Версия: %1$s</string>
+    <string name="add_user">Add user</string>
+    <string name="no_users">No saved users yet</string>
+    <string name="delete_user">Delete user</string>
+    <string name="delete_user_confirm">Delete user %1$s?</string>
+    <string name="user_has_password">password saved</string>
+    <string name="user_added">User %1$s added</string>
+    <string name="user_deleted">User %1$s deleted</string>
+    <string name="users_cleared">All saved users have been removed</string>
+
+    <string name="settings_notify_section">Notification</string>
+    <string name="settings_show_notification">Show notification</string>
+    <string name="settings_show_notification_summary">Show connection status and a Disconnect button</string>
+
+    <string name="settings_connection_section">Connection</string>
+    <string name="settings_appearance_section">Appearance</string>
+    <string name="settings_debug_section">Debug</string>
+    <string name="settings_data_section">Data</string>
+    <string name="settings_auto_connect">Auto-connect</string>
+    <string name="settings_auto_connect_summary">Connect to the last profile when the app starts</string>
+    <string name="settings_screen_off">Pause when screen is off</string>
+    <string name="settings_screen_off_summary">Pause the VPN when the screen is off</string>
+    <string name="settings_ignore_net_state">Ignore network state</string>
+    <string name="settings_ignore_net_state_summary">Do not react to network changes</string>
+    <string name="settings_net_change_reconnect">Reconnect on network change</string>
+    <string name="settings_net_change_reconnect_summary">Restart the connection when the network is lost</string>
+    <string name="settings_theme">App theme</string>
+    <string name="settings_theme_summary">%1$s</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="settings_debug_mode">Debug mode</string>
+    <string name="settings_debug_mode_summary">Show the "Copy log" button</string>
+    <string name="settings_experimental_themes">Experimental themes</string>
+    <string name="settings_experimental_themes_summary">Alternative app designs (requires debug mode)</string>
+    <string name="clear_users">Delete all users</string>
+    <string name="clear_users_confirm">Delete all saved logins and passwords?</string>
+    <string name="settings_version">Version: %1$s</string>
+
+    <string name="experimental_themes_title">Experimental themes</string>
+    <string name="experimental_default">Original</string>
+    <string name="experimental_default_desc">Standard dark and light themes</string>
+    <string name="theme_neon_name">Neon Grid</string>
+    <string name="theme_neon_desc">Pure black, cyan and magenta, sharp lines, wide connect bar</string>
+    <string name="theme_oled_name">OLED</string>
+    <string name="theme_oled_desc">Monochrome black and white, outlined connect button</string>
+    <string name="theme_paper_name">Paper Desk</string>
+    <string name="theme_paper_desc">Warm ivory and deep navy, soft rounded shapes</string>
+    <string name="theme_redline_name">Red Line</string>
+    <string name="theme_redline_desc">Security style: black, red and amber</string>
+    <string name="theme_mint_name">Mint</string>
+    <string name="theme_mint_desc">Light airy design with a teal accent</string>
+    <string name="theme_dialog_title">Standard theme</string>
+    <string name="theme_dialog_message">Enabling standard themes will disable experimental themes. Continue?</string>
 </resources>

@@ -9,12 +9,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import com.mropenovpn.client.BaseActivity
 import com.mropenovpn.client.R
 import com.mropenovpn.client.VpnUsers
 import de.blinkt.openvpn.core.VpnStatus
 
-class UsersActivity : AppCompatActivity() {
+class UsersActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

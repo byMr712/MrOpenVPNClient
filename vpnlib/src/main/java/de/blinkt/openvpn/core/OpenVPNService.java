@@ -105,6 +105,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     private static final int PRIORITY_MAX = 2;
     private static boolean mNotificationAlwaysVisible = false;
     private static Class<? extends Activity> mNotificationActivityClass;
+    private static boolean mShowNotification = true;
+    private boolean mForegroundStarted = false;
 
 
     static class TunConfig {
@@ -219,6 +221,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
      */
     public static void setNotificationActivityClass(Class<? extends Activity> activityClass) {
         mNotificationActivityClass = activityClass;
+    }
+
+    public static void setNotificationVisible(boolean visible) {
+        mShowNotification = visible;
     }
 
     PendingIntent getContentIntent() {
@@ -410,9 +416,16 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         int notificationId = channel.hashCode();
 
-        mNotificationManager.notify(notificationId, notification);
-
-        startForeground(notificationId, notification);
+        if (mShowNotification) {
+            mNotificationManager.notify(notificationId, notification);
+            startForeground(notificationId, notification);
+        } else {
+            if (!mForegroundStarted) {
+                startForeground(notificationId, notification);
+                mForegroundStarted = true;
+            }
+            mNotificationManager.cancel(notificationId);
+        }
 
         if (lastChannel != null && !channel.equals(lastChannel)) {
             // Cancel old notification
@@ -561,6 +574,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mIsUserDisconnect = false;
+        mForegroundStarted = false;
         if (intent != null && intent.getBooleanExtra(ALWAYS_SHOW_NOTIFICATION, false))
             mNotificationAlwaysVisible = true;
 
@@ -1387,6 +1401,9 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     }
 
     private void triggerDisconnectNotification() {
+        if (!mShowNotification) {
+            return;
+        }
         String channelId = NOTIFICATION_CHANNEL_ERROR_ID;
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
