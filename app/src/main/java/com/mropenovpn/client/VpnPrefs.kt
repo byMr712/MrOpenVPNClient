@@ -11,9 +11,9 @@ object VpnPrefs {
     private const val KEY_NET_CHANGE_RECONNECT = "netchangereconnect"
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DEBUG_MODE = "debug_mode"
-    private const val KEY_LIGHT_THEME = "light_theme"
     private const val KEY_NOTIFY = "notify"
     private const val KEY_EXPERIMENTAL_THEME = "experimental_theme"
+    private const val KEY_LIGHT_THEME = "light_theme"
     private const val KEY_ACCENT = "accent_color"
 
     fun notifyEnabled(context: Context): Boolean =
@@ -42,6 +42,17 @@ object VpnPrefs {
             .commit()
     }
 
+    fun isLightTheme(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getBoolean(KEY_LIGHT_THEME, false)
+
+    fun setLightTheme(context: Context, value: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_LIGHT_THEME, value)
+            .commit()
+    }
+
     fun language(context: Context): String =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .getString(KEY_LANGUAGE, "en")
@@ -56,8 +67,8 @@ object VpnPrefs {
 
     fun accentColor(context: Context): String =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .getString(KEY_ACCENT, "")
-            ?: ""
+            .getString(KEY_ACCENT, ExperimentalThemes.defaultBlackAccentHex)
+            ?: ExperimentalThemes.defaultBlackAccentHex
 
     fun setAccentColor(context: Context, hex: String) {
         // commit() is required here: clearing the accent while disabling an
@@ -78,20 +89,6 @@ object VpnPrefs {
             .edit()
             .putBoolean(KEY_DEBUG_MODE, value)
             .apply()
-    }
-
-    fun isLightTheme(context: Context): Boolean =
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .getBoolean(KEY_LIGHT_THEME, false)
-
-    fun setLightTheme(context: Context, value: Boolean) {
-        // commit() is required here: toggling the light theme while an
-        // experimental theme is active is followed by restartApp(), and an
-        // async apply() could be lost when the process is killed.
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_LIGHT_THEME, value)
-            .commit()
     }
 
     fun lastProfileUuid(context: Context): String? =
@@ -123,11 +120,8 @@ object VpnPrefs {
         vpnPrefs(context).edit().putBoolean(KEY_SCREENOFF, value).apply()
     }
 
-    fun netChangeReconnect(context: Context): Boolean =
-        vpnPrefs(context).getBoolean(KEY_NET_CHANGE_RECONNECT, true)
-
-    fun setNetChangeReconnect(context: Context, value: Boolean) {
-        vpnPrefs(context).edit().putBoolean(KEY_NET_CHANGE_RECONNECT, value).apply()
+    fun forceNetChangeReconnect(context: Context) {
+        vpnPrefs(context).edit().putBoolean(KEY_NET_CHANGE_RECONNECT, true).commit()
     }
 
     fun clearUsers(context: Context) {

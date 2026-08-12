@@ -32,10 +32,11 @@ class ExperimentalThemesActivity : BaseActivity() {
         findViewById<ImageButton>(R.id.backButton).setOnClickListener { finish() }
 
         val container = findViewById<LinearLayout>(R.id.optionsContainer)
-        val currentTheme = VpnPrefs.experimentalTheme(this)
-        val current = if (currentTheme.isEmpty()) {
+        val current = if (VpnPrefs.experimentalTheme(this).isEmpty()) {
             if (VpnPrefs.isLightTheme(this)) "default_white" else "default_black"
-        } else currentTheme
+        } else {
+            VpnPrefs.experimentalTheme(this)
+        }
 
         val options = buildList {
             add(Triple<String?, String, String>("default_black", getString(R.string.theme_default_black), getString(R.string.theme_default_black_desc)))
@@ -87,7 +88,6 @@ class ExperimentalThemesActivity : BaseActivity() {
             orientation = LinearLayout.HORIZONTAL
         }
         val swatchList = mutableListOf<Swatch>()
-        var previewSwatch: Swatch? = null
 
         fun addPresetSwatch(hex: String) {
             val sw = buildSwatch(hex, currentHex) {
@@ -95,14 +95,12 @@ class ExperimentalThemesActivity : BaseActivity() {
                     VpnPrefs.setAccentColor(this@ExperimentalThemesActivity, hex)
                     ExperimentalThemes.applyAccentOverlay(this@ExperimentalThemesActivity, hex)
                     refreshSwatches(swatchList)
-                    previewSwatch?.let { updatePreview(it, hex) }
                 }
             }
             swatchList.add(sw)
             swatches.addView(sw.frame)
         }
 
-        addPresetSwatch("")
         ExperimentalThemes.accents.forEach { accent ->
             addPresetSwatch(accent.hex)
         }
@@ -129,18 +127,12 @@ class ExperimentalThemesActivity : BaseActivity() {
             setTextColor(themeColor())
             setHintTextColor(androidx.core.graphics.ColorUtils.setAlphaComponent(themeColor(), 0x66))
             layoutParams = LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1f
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
 
-        val preview = buildSwatch(currentHex, currentHex) {}
-        preview.frame.isClickable = false
-        preview.frame.isFocusable = false
-
         hexRow.addView(input)
-        hexRow.addView(preview.frame)
         section.addView(hexRow)
 
         input.addTextChangedListener(object : TextWatcher {
@@ -161,7 +153,6 @@ class ExperimentalThemesActivity : BaseActivity() {
                     VpnPrefs.setAccentColor(this@ExperimentalThemesActivity, normalized)
                     ExperimentalThemes.applyAccentOverlay(this@ExperimentalThemesActivity, normalized)
                     refreshSwatches(swatchList)
-                    updatePreview(preview, normalized)
                 }
             }
         })
@@ -189,14 +180,6 @@ class ExperimentalThemesActivity : BaseActivity() {
             sw.frame.removeAllViews()
             if (selected) sw.frame.addView(buildCheck(sw.hex))
         }
-    }
-
-    private fun updatePreview(sw: Swatch, hex: String) {
-        val density = resources.displayMetrics.density
-        sw.circle.setColor(if (hex.isEmpty()) Color.TRANSPARENT else Color.parseColor(hex))
-        sw.circle.setStroke((3 * density).toInt(), themeColor())
-        sw.frame.removeAllViews()
-        sw.frame.addView(buildCheck(if (hex.isEmpty()) "" else hex))
     }
 
     private fun buildCheck(hex: String): TextView = TextView(this).apply {

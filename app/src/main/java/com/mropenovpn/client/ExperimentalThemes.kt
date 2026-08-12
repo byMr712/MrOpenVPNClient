@@ -2,7 +2,6 @@ package com.mropenovpn.client
 
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -13,6 +12,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RadioButton
+import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -134,12 +134,14 @@ object ExperimentalThemes {
         tintViewTree(root, accent)
     }
 
+    fun applyCurrentAccent(view: View) {
+        val hex = VpnPrefs.accentColor(view.context)
+        if (hex.isNotEmpty()) applyAccentOverlay(view, hex)
+    }
+
     fun applyAccentToDialog(dialog: Dialog) {
-        val hex = VpnPrefs.accentColor(dialog.context)
-        if (hex.isEmpty()) return
-        val accent = parseColor(hex) ?: return
         val window = dialog.window ?: return
-        tintViewTree(window.decorView, accent)
+        val accent = parseColor(VpnPrefs.accentColor(dialog.context))
 
         val density = dialog.context.resources.displayMetrics.density
         val ta = dialog.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.colorBackground))
@@ -149,22 +151,25 @@ object ExperimentalThemes {
         val shape = GradientDrawable().apply {
             setColor(bgColor)
             cornerRadius = 16 * density
-            setStroke((1.5 * density).toInt(), accent)
+            if (accent != null) {
+                setStroke((1.5 * density).toInt(), accent)
+            }
         }
         window.setBackgroundDrawable(shape)
 
-        (dialog as? android.app.AlertDialog)?.let { alert ->
-            intArrayOf(
-                DialogInterface.BUTTON_POSITIVE,
-                DialogInterface.BUTTON_NEGATIVE,
-                DialogInterface.BUTTON_NEUTRAL
-            ).forEach { which ->
-                alert.getButton(which)?.let { button ->
-                    button.backgroundTintList = null
-                    button.setTextColor(accent)
-                }
+        if (accent == null) return
+        tintViewTree(window.decorView, accent)
+
+        fun clearButtonBackground(view: View) {
+            if (view is Button) {
+                view.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                view.setTextColor(accent)
+            }
+            if (view is ViewGroup) {
+                for (i in 0 until view.childCount) clearButtonBackground(view.getChildAt(i))
             }
         }
+        clearButtonBackground(window.decorView)
     }
 
     private fun tintViewTree(root: View, accent: Int) {
@@ -225,13 +230,23 @@ object ExperimentalThemes {
                     arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
                     intArrayOf(accent, onSurface)
                 )
-                view is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
                 view is MaterialButton -> {
                     val shapeBg = view.background as? MaterialShapeDrawable
-                    val isFilled = shapeBg?.fillColor?.defaultColor?.let { Color.alpha(it) > 0 } != false
-                    view.backgroundTintList = ColorStateList.valueOf(accent)
-                    view.setTextColor(if (isFilled) onAccent else accent)
+                    val hasStroke = shapeBg?.strokeColor?.defaultColor?.let { Color.alpha(it) > 0 } == true
+                    if (hasStroke) {
+                        view.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                        view.strokeColor = ColorStateList.valueOf(accent)
+                        view.setTextColor(accent)
+                    } else if (shapeBg?.fillColor?.defaultColor?.let { Color.alpha(it) > 0 } == true) {
+                        view.backgroundTintList = ColorStateList.valueOf(accent)
+                        view.setTextColor(onAccent)
+                    } else {
+                        view.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                        view.setTextColor(accent)
+                    }
                 }
+                view is Spinner -> view.backgroundTintList = ColorStateList.valueOf(accent)
+                view is Button -> view.backgroundTintList = ColorStateList.valueOf(accent)
                 view is EditText -> view.backgroundTintList = ColorStateList.valueOf(accent)
                 view is TextView -> if (view.currentTextColor == primary) {
                     view.setTextColor(accent)

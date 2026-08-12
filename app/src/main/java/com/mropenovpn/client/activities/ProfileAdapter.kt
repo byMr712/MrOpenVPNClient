@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.mropenovpn.client.ExperimentalThemes
 import com.mropenovpn.client.R
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.VpnStatus
@@ -34,6 +35,7 @@ class ProfileAdapter(
 
     override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
         holder.bind(profiles[position])
+        ExperimentalThemes.applyCurrentAccent(holder.itemView)
     }
 
     inner class ProfileViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

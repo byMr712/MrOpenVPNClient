@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#00E676</color>
-    <color name="onPrimary">#00391C</color>
-    <color name="primaryContainer">#005C30</color>
-    <color name="onPrimaryContainer">#66FFA6</color>
-    <color name="secondary">#A7C9B4</color>
-    <color name="onSecondary">#103522</color>
+    <color name="primary">#FFFFFF</color>
+    <color name="onPrimary">#000000</color>
+    <color name="primaryContainer">#2A2A2A</color>
+    <color name="onPrimaryContainer">#FFFFFF</color>
+    <color name="secondary">#9E9E9E</color>
+    <color name="onSecondary">#000000</color>
     <color name="background">#000000</color>
     <color name="surface">#000000</color>
-    <color name="surfaceContainer">#121413</color>
-    <color name="surfaceContainerHigh">#1D201E</color>
-    <color name="onSurface">#E4E8E4</color>
+    <color name="surfaceContainer">#121212</color>
+    <color name="surfaceContainerHigh">#1E1E1E</color>
+    <color name="onSurface">#E6E6E6</color>
     <color name="onSurfaceVariant">#808080</color>
-    <color name="outline">#5B665E</color>
+    <color name="outline">#666666</color>
     <color name="error">#FF6B62</color>
 
     <color name="ic_launcher_background">#00E676</color>

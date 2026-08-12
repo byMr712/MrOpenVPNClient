@@ -43,7 +43,6 @@ class SettingsActivity : BaseActivity() {
 
         val swAutoConnect = findViewById<MaterialSwitch>(R.id.swAutoConnect)
         val swScreenOff = findViewById<MaterialSwitch>(R.id.swScreenOff)
-        val swNetChangeReconnect = findViewById<MaterialSwitch>(R.id.swNetChangeReconnect)
 
         swAutoConnect.isChecked = VpnPrefs.autoConnect(this)
         swAutoConnect.setOnCheckedChangeListener { _, checked ->
@@ -53,11 +52,6 @@ class SettingsActivity : BaseActivity() {
         swScreenOff.isChecked = VpnPrefs.screenOffPause(this)
         swScreenOff.setOnCheckedChangeListener { _, checked ->
             VpnPrefs.setScreenOffPause(this, checked)
-        }
-
-        swNetChangeReconnect.isChecked = VpnPrefs.netChangeReconnect(this)
-        swNetChangeReconnect.setOnCheckedChangeListener { _, checked ->
-            VpnPrefs.setNetChangeReconnect(this, checked)
         }
 
         findViewById<TextView>(R.id.clearUsersButton).setOnClickListener {

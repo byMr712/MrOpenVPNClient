@@ -15,5 +15,6 @@ class MrOpenVpnApp : Application() {
         )
         OpenVPNService.setNotificationVisible(VpnPrefs.notifyEnabled(this))
         VpnStatus.initLogCache(cacheDir)
+        VpnPrefs.forceNetChangeReconnect(this)
     }
 }

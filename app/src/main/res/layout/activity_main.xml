@@ -64,14 +64,16 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/copyLogButton"
-                    style="?android:attr/borderlessButtonStyle"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/copy_log"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    app:cornerRadius="16dp"
+                    app:strokeWidth="1dp" />
 
                 <TextView
                     android:id="@+id/profilesTitle"
@@ -81,12 +83,15 @@
                     android:text="@string/profiles"
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/addProfileButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/add_profile" />
+                    android:text="@string/add_profile"
+                    app:cornerRadius="16dp"
+                    app:strokeWidth="1dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/profileList"
