@@ -96,13 +96,13 @@
     <string name="settings_net_change_reconnect_summary">Перезапускать соединение при потере сети</string>
     <string name="settings_debug_mode">Режим отладки</string>
     <string name="settings_debug_mode_summary">Показывать кнопку «Копировать логи»</string>
-    <string name="settings_experimental_themes">Экспериментальные темы</string>
+    <string name="settings_experimental_themes">Тема приложения</string>
     <string name="settings_experimental_themes_summary">Альтернативные дизайны приложения</string>
     <string name="clear_users">Удалить всех пользователей</string>
     <string name="clear_users_confirm">Удалить все сохранённые логины и пароли?</string>
     <string name="settings_version">Версия: %1$s</string>
 
-    <string name="experimental_themes_title">Экспериментальные темы</string>
+    <string name="experimental_themes_title">Тема приложения</string>
     <string name="theme_default_black">Чёрная - по умолчанию</string>
     <string name="theme_default_black_desc">Обычная тёмная тема, без эффектов</string>
     <string name="theme_default_white">Белая - по умолчанию</string>
