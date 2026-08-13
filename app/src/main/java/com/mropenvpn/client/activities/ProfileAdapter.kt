@@ -1,4 +1,4 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,9 +7,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
-import com.mropenovpn.client.ExperimentalThemes
-import com.mropenovpn.client.R
-import com.mropenovpn.client.VpnPrefs
+import com.mropenvpn.client.ExperimentalThemes
+import com.mropenvpn.client.R
+import com.mropenvpn.client.VpnPrefs
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ConnectionStatus
 import de.blinkt.openvpn.core.VpnStatus
@@ -69,10 +69,10 @@ class ProfileAdapter(
         }
 
         fun bind(profile: VpnProfile) {
-            nameText.text = profile.mName
+            nameText.text = itemView.context.getString(R.string.profile_name_format, profile.mName)
             itemView.setOnClickListener { onSelectUser(profile) }
             if (profile.mUsername.isNotEmpty()) {
-                userText.text = profile.mUsername
+                userText.text = itemView.context.getString(R.string.user_name_format, profile.mUsername)
                 userText.visibility = View.VISIBLE
             } else {
                 userText.visibility = View.GONE

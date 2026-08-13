@@ -24,14 +24,13 @@
                 android:id="@+id/profileNameText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/no_profiles"
                 android:textAppearance="?attr/textAppearanceTitleSmall" />
 
             <TextView
                 android:id="@+id/profileUserText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
                 android:visibility="gone" />
         </LinearLayout>
 

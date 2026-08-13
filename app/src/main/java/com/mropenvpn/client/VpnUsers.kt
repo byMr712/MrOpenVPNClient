@@ -1,4 +1,4 @@
-package com.mropenovpn.client
+package com.mropenvpn.client
 
 import android.content.Context
 import android.util.Base64
@@ -24,6 +24,14 @@ object VpnUsers {
 
     fun password(context: Context, login: String): String? =
         prefs(context).getString(key(login), null)
+
+    fun uniqueName(context: Context, base: String): String {
+        val names = users(context).toMutableSet()
+        if (base !in names) return base
+        var i = 2
+        while ("$base ($i)" in names) i++
+        return "$base ($i)"
+    }
 
     fun save(context: Context, login: String, password: String) {
         val p = prefs(context)

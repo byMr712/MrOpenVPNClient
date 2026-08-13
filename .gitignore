@@ -27,3 +27,6 @@ captures/
 
 # Local debug log copied from the device
 logs*.txt
+
+# Backup information for sign key
+info_for_key.txt

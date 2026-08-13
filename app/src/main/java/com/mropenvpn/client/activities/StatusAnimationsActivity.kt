@@ -1,5 +1,6 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
@@ -8,9 +9,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.radiobutton.MaterialRadioButton
-import com.mropenovpn.client.BaseActivity
-import com.mropenovpn.client.R
-import com.mropenovpn.client.VpnPrefs
+import com.mropenvpn.client.BaseActivity
+import com.mropenvpn.client.ExperimentalThemes
+import com.mropenvpn.client.R
+import com.mropenvpn.client.VpnPrefs
 
 class StatusAnimationsActivity : BaseActivity() {
 
@@ -19,6 +21,9 @@ class StatusAnimationsActivity : BaseActivity() {
         const val TARGET_STATUS = "status"
         const val TARGET_PROFILE = "profile"
     }
+
+    private var previewAnim: String? = null
+    private var previewAnimator: StatusOutlineAnimator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,24 +41,64 @@ class StatusAnimationsActivity : BaseActivity() {
         )
 
         val container = findViewById<LinearLayout>(R.id.optionsContainer)
-        val current = if (target == TARGET_PROFILE) {
-            VpnPrefs.profileOutlineAnim(this)
-        } else {
-            VpnPrefs.statusOutlineAnim(this)
-        }
-        StatusOutlineAnimator.variants.forEach { id ->
-            container.addView(
-                buildOption(id, selected = id == current) {
-                    if (id != current) {
-                        if (target == TARGET_PROFILE) {
-                            VpnPrefs.setProfileOutlineAnim(this, id)
-                        } else {
-                            VpnPrefs.setStatusOutlineAnim(this, id)
+
+        fun rebuild(currentId: String) {
+            previewAnim = currentId
+            container.removeAllViews()
+            StatusOutlineAnimator.variants.forEach { id ->
+                container.addView(
+                    buildOption(id, selected = id == currentId) {
+                        if (id != currentId) {
+                            if (target == TARGET_PROFILE) {
+                                VpnPrefs.setProfileOutlineAnim(this, id)
+                            } else {
+                                VpnPrefs.setStatusOutlineAnim(this, id)
+                            }
+                            rebuild(id)
                         }
                     }
-                }
-            )
+                )
+            }
+            addPreview(container, target)
         }
+
+        rebuild(
+            if (target == TARGET_PROFILE) {
+                VpnPrefs.profileOutlineAnim(this)
+            } else {
+                VpnPrefs.statusOutlineAnim(this)
+            }
+        )
+    }
+
+    override fun onDestroy() {
+        previewAnimator?.stop()
+        super.onDestroy()
+    }
+
+    private fun addPreview(container: LinearLayout, target: String) {
+        val density = resources.displayMetrics.density
+        val card = MaterialCardView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                if (target == TARGET_STATUS) {
+                    (120 * density).toInt()
+                } else {
+                    (72 * density).toInt()
+                }
+            ).apply {
+                topMargin = (8 * density).toInt()
+            }
+            radius = if (target == TARGET_STATUS) (16 * density) else (12 * density)
+            isClickable = false
+            isFocusable = false
+        }
+
+        previewAnimator?.stop()
+        previewAnimator = StatusOutlineAnimator(this, card) { previewAnim }
+        previewAnimator?.setState(StatusOutlineAnimator.State.CONNECTING)
+
+        container.addView(card)
     }
 
     private fun buildOption(id: String, selected: Boolean, onClick: () -> Unit): MaterialCardView {
@@ -89,6 +134,7 @@ class StatusAnimationsActivity : BaseActivity() {
                 this@StatusAnimationsActivity,
                 com.google.android.material.R.style.TextAppearance_Material3_TitleSmall
             )
+            setTextColor(accentColor())
         })
         texts.addView(TextView(this).apply {
             text = descFor(id)
@@ -96,6 +142,7 @@ class StatusAnimationsActivity : BaseActivity() {
                 this@StatusAnimationsActivity,
                 com.google.android.material.R.style.TextAppearance_Material3_BodySmall
             )
+            setTextColor(accentColor())
         })
 
         val radio = MaterialRadioButton(this).apply {
@@ -109,6 +156,16 @@ class StatusAnimationsActivity : BaseActivity() {
         card.setOnClickListener { onClick() }
         return card
     }
+
+    private fun themeColor(): Int {
+        val ta = obtainStyledAttributes(intArrayOf(com.google.android.material.R.attr.colorOnSurface))
+        val color = ta.getColor(0, Color.BLACK)
+        ta.recycle()
+        return color
+    }
+
+    private fun accentColor(): Int =
+        ExperimentalThemes.accentOrDefaultColor(this, themeColor())
 
     private fun nameFor(id: String): String =
         when (id) {

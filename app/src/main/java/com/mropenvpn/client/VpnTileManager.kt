@@ -1,10 +1,10 @@
-package com.mropenovpn.client
+package com.mropenvpn.client
 
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
 import android.service.quicksettings.TileService
-import com.mropenovpn.client.activities.VpnTile0
+import com.mropenvpn.client.activities.VpnTile0
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ProfileManager
 

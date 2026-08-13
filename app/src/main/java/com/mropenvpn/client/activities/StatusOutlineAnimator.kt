@@ -1,4 +1,4 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -6,8 +6,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.animation.LinearInterpolator
 import com.google.android.material.card.MaterialCardView
-import com.mropenovpn.client.ExperimentalThemes
-import com.mropenovpn.client.VpnPrefs
+import com.mropenvpn.client.ExperimentalThemes
+import com.mropenvpn.client.VpnPrefs
 
 class StatusOutlineAnimator(
     private val context: Context,

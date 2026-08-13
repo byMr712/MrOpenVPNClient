@@ -1,11 +1,11 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
-import com.mropenovpn.client.BaseActivity
-import com.mropenovpn.client.R
+import com.mropenvpn.client.BaseActivity
+import com.mropenvpn.client.R
 import de.blinkt.openvpn.core.VpnStatus
 
 class LogWindow : BaseActivity() {

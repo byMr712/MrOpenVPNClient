@@ -12,11 +12,15 @@
     <string name="disconnect">Отключить</string>
     <string name="yes">Да</string>
     <string name="cancel">Отмена</string>
+    <string name="enable">Включить</string>
+    <string name="debug_mode_confirm_message">Включение режима отладки может привести к неправильной работе приложения. Включить?</string>
 
     <string name="add_profile">Добавить профиль</string>
     <string name="import_profile">Импортировать профиль .ovpn</string>
     <string name="profiles">Профили</string>
     <string name="no_profiles">Пока нет профилей</string>
+    <string name="profile_name_format">Профиль: %1$s</string>
+    <string name="user_name_format">Пользователь: %1$s</string>
 
     <string name="main_connect">Подключиться</string>
     <string name="main_disconnect">Отключиться</string>
@@ -36,6 +40,7 @@
 
     <string name="import_success">Профиль импортирован: %1$s</string>
     <string name="import_error">Не удалось импортировать профиль: %1$s</string>
+    <string name="imported_profile">Импортированный профиль</string>
     <string name="vpn_permission_denied">Разрешение VPN не было предоставлено.</string>
     <string name="vpn_start_error">Не удалось запустить VPN.</string>
     <string name="copy_log">Копировать логи</string>
@@ -63,8 +68,9 @@
     <string name="language_en">English</string>
     <string name="language_ru">Русский</string>
 
-    <string name="about_version">Версия %1$s</string>
-    <string name="source_code">Исходный код</string>
+    <string name="about_developer">Разработчик: %1$s</string>
+    <string name="about_version">Версия: %1$s</string>
+    <string name="source_code">Исходный код на GitHub</string>
 
     <string name="add_user">Добавить пользователя</string>
     <string name="select_user">Выберите пользователя</string>
@@ -87,14 +93,12 @@
     <string name="profile_deleted">Профиль %1$s удалён</string>
     <string name="no_account">Без аккаунта</string>
 
-    <string name="settings_notify_section">Уведомление</string>
     <string name="settings_show_notification">Показывать уведомление</string>
     <string name="settings_show_notification_summary">Статус подключения и кнопка «Отключить»</string>
 
     <string name="settings_connection_section">Подключение</string>
     <string name="settings_appearance_section">Кастомизация</string>
     <string name="settings_debug_section">Отладка</string>
-    <string name="settings_data_section">Данные</string>
     <string name="settings_auto_connect">Автоподключение</string>
     <string name="settings_auto_connect_summary">Подключаться к последнему профилю при запуске приложения</string>
     <string name="settings_screen_off">Пауза при выключенном экране</string>
@@ -107,6 +111,9 @@
     <string name="settings_experimental_themes_summary">Альтернативные дизайны</string>
     <string name="clear_users">Удалить всех пользователей</string>
     <string name="clear_users_confirm">Удалить все сохранённые логины и пароли?</string>
+    <string name="reset_data">Сбросить данные приложения</string>
+    <string name="reset_data_confirm">Удалить все профили, пользователей и настройки?</string>
+    <string name="reset_data_done">Данные приложения сброшены</string>
     <string name="settings_version">Версия: %1$s</string>
 
     <string name="experimental_themes_title">Тема приложения</string>

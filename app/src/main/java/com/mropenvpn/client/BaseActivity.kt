@@ -1,4 +1,4 @@
-package com.mropenovpn.client
+package com.mropenvpn.client
 
 import android.content.Context
 import android.content.Intent

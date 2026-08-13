@@ -1,4 +1,4 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,10 +9,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.mropenovpn.client.BaseActivity
-import com.mropenovpn.client.ExperimentalThemes
-import com.mropenovpn.client.R
-import com.mropenovpn.client.VpnUsers
+import com.mropenvpn.client.BaseActivity
+import com.mropenvpn.client.ExperimentalThemes
+import com.mropenvpn.client.R
+import com.mropenvpn.client.VpnUsers
 import de.blinkt.openvpn.core.ProfileManager
 import de.blinkt.openvpn.core.VpnStatus
 
@@ -69,7 +69,10 @@ class UsersActivity : BaseActivity() {
             .setTitle(R.string.add_user)
             .setView(view)
             .setPositiveButton(R.string.save) { _, _ ->
-                val username = userInput.text.toString().trim()
+                val username = VpnUsers.uniqueName(
+                    this,
+                    userInput.text.toString().trim()
+                )
                 val password = passInput.text.toString()
                 if (username.isEmpty() || password.isEmpty()) {
                     Toast.makeText(this, R.string.credentials_required, Toast.LENGTH_LONG).show()

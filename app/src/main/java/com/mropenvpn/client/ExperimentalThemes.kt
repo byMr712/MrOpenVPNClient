@@ -1,4 +1,4 @@
-package com.mropenovpn.client
+package com.mropenvpn.client
 
 import android.app.Dialog
 import android.content.Context
@@ -144,16 +144,21 @@ object ExperimentalThemes {
         val accent = parseColor(VpnPrefs.accentColor(dialog.context))
 
         val density = dialog.context.resources.displayMetrics.density
-        val ta = dialog.context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.colorBackground))
+        val ta = dialog.context.theme.obtainStyledAttributes(
+            intArrayOf(
+                com.google.android.material.R.attr.colorSurface,
+                com.google.android.material.R.attr.colorPrimary
+            )
+        )
         val bgColor = ta.getColor(0, Color.BLACK)
+        val primary = ta.getColor(1, Color.BLACK)
         ta.recycle()
+        val borderAccent = accent ?: primary
 
         val shape = GradientDrawable().apply {
             setColor(bgColor)
             cornerRadius = 16 * density
-            if (accent != null) {
-                setStroke((2 * density).toInt(), accent)
-            }
+            setStroke((2 * density).toInt(), borderAccent)
         }
         window.setBackgroundDrawable(shape)
 
@@ -170,6 +175,22 @@ object ExperimentalThemes {
             }
         }
         clearButtonBackground(window.decorView)
+
+        fun styleSpinnerPopups(view: View) {
+            if (view is Spinner) {
+                val density = view.context.resources.displayMetrics.density
+                val popup = GradientDrawable().apply {
+                    setColor(bgColor)
+                    cornerRadius = 16 * density
+                    setStroke((2 * density).toInt(), borderAccent)
+                }
+                view.setPopupBackgroundDrawable(popup)
+            }
+            if (view is ViewGroup) {
+                for (i in 0 until view.childCount) styleSpinnerPopups(view.getChildAt(i))
+            }
+        }
+        styleSpinnerPopups(window.decorView)
     }
 
     private fun tintViewTree(root: View, accent: Int) {

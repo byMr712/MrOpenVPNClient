@@ -1,13 +1,13 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import com.google.android.material.materialswitch.MaterialSwitch
-import com.mropenovpn.client.BaseActivity
-import com.mropenovpn.client.R
-import com.mropenovpn.client.VpnPrefs
+import com.mropenvpn.client.BaseActivity
+import com.mropenvpn.client.R
+import com.mropenvpn.client.VpnPrefs
 
 class AppAnimationsActivity : BaseActivity() {
 

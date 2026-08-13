@@ -393,12 +393,18 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
         return userpause == connectState.DISCONNECTED;
     }
 
+    public boolean isPaused() {
+        return userpause == connectState.DISCONNECTED
+                || screen == connectState.DISCONNECTED
+                || network == connectState.DISCONNECTED;
+    }
+
     private boolean shouldBeConnected() {
         return (screen == connectState.SHOULDBECONNECTED && userpause == connectState.SHOULDBECONNECTED &&
                 network == connectState.SHOULDBECONNECTED);
     }
 
-    private pauseReason getPauseReason() {
+    public pauseReason getPauseReason() {
         if (userpause == connectState.DISCONNECTED)
             return pauseReason.userPause;
 

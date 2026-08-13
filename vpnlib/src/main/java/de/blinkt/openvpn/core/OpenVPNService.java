@@ -97,8 +97,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     public final static String ORBOT_PACKAGE_NAME = "org.torproject.android";
     public static final String EXTRA_CHALLENGE_TXT = "de.blinkt.openvpn.core.CR_TEXT_CHALLENGE";
     public static final String EXTRA_CHALLENGE_OPENURL = "de.blinkt.openvpn.core.OPENURL_CHALLENGE";
-    private static final String PAUSE_VPN = "de.blinkt.openvpn.PAUSE_VPN";
-    private static final String RESUME_VPN = "de.blinkt.openvpn.RESUME_VPN";
+    public static final String PAUSE_VPN = "de.blinkt.openvpn.PAUSE_VPN";
+    public static final String RESUME_VPN = "de.blinkt.openvpn.RESUME_VPN";
     public static boolean mDisplaySpeed = true;
     private static final int PRIORITY_MIN = -2;
     private static final int PRIORITY_DEFAULT = 0;
@@ -234,23 +234,28 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         }
     }
 
-    private void applyNotificationVisibility() {
-        if (mProcessThread == null)
-            return;
+    public static boolean isUserPaused() {
+        OpenVPNService service = sInstance;
+        return service != null
+                && service.mDeviceStateReceiver != null
+                && service.mDeviceStateReceiver.isUserPaused();
+    }
 
+    private void applyNotificationVisibility() {
         String msg = VpnStatus.getLastCleanLogMessage(this);
         if (mShowNotification) {
+            if (mProcessThread == null)
+                return;
             String channel = (mLastNotificationLevel == ConnectionStatus.LEVEL_CONNECTED)
                     ? NOTIFICATION_CHANNEL_BG_ID
                     : NOTIFICATION_CHANNEL_NEWSTATUS_ID;
             showNotification(msg, null, channel, mConnecttime, mLastNotificationLevel, mLastNotificationIntent);
         } else {
-            showNotification(msg, null, NOTIFICATION_CHANNEL_NEWSTATUS_ID, 0,
-                    mLastNotificationLevel, mLastNotificationIntent);
             NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             nm.cancel(NOTIFICATION_CHANNEL_BG_ID.hashCode());
             nm.cancel(NOTIFICATION_CHANNEL_ERROR_ID.hashCode());
             nm.cancel(NOTIFICATION_CHANNEL_USERREQ_ID.hashCode());
+            nm.cancel(NOTIFICATION_CHANNEL_NEWSTATUS_ID.hashCode());
         }
     }
 
@@ -446,6 +451,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         if (mShowNotification) {
             mNotificationManager.notify(notificationId, notification);
             startForeground(notificationId, notification);
+            mForegroundStarted = true;
         } else {
             if (!mForegroundStarted) {
                 startForeground(notificationId, notification);
@@ -1503,7 +1509,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 mConnecttime = System.currentTimeMillis();
                 mWasConnected = true;
                 mIsUserDisconnect = false;
-                if (!runningOnAndroidTV())
+                if (mShowNotification && !runningOnAndroidTV())
                     channel = NOTIFICATION_CHANNEL_BG_ID;
             } else {
                 mDisplayBytecount = false;
@@ -1514,14 +1520,37 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 }
             }
 
+            // While paused, the notification must only show the localized
+            // pause reason, not the raw OpenVPN "Reconnecting: SIGUSR1" text.
+            String message;
+            if (mDeviceStateReceiver != null && mDeviceStateReceiver.isPaused()) {
+                message = getPauseNotificationMessage();
+            } else {
+                message = VpnStatus.getLastCleanLogMessage(this);
+            }
+
             // Other notifications are shown,
             // This also mean we are no longer connected, ignore bytecount messages until next
             // CONNECTED
             // Does not work :(
-            showNotification(VpnStatus.getLastCleanLogMessage(this),
-                    VpnStatus.getLastCleanLogMessage(this), channel, 0, level, intent);
+            showNotification(message, message, channel, 0, level, intent);
 
         }
+    }
+
+    private String getPauseNotificationMessage() {
+        if (mDeviceStateReceiver != null) {
+            switch (mDeviceStateReceiver.getPauseReason()) {
+                case screenOff:
+                    return getString(R.string.state_screenoff);
+                case noNetwork:
+                    return getString(R.string.state_nonetwork);
+                case userPause:
+                default:
+                    return getString(R.string.state_connection_paused);
+            }
+        }
+        return getString(R.string.state_connection_paused);
     }
 
     @Override

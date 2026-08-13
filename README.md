@@ -1,73 +1,86 @@
-# MrOpenVPN
+# MrOpenVPN Client
 
-**Это клиент для [OpenVPN](https://openvpn.net/) на Android — форк проекта [ics-openvpn](https://github.com/schwabe/ics-openvpn) v0.7.64.**
+**MrOpenVPN Client is an [OpenVPN](https://openvpn.net/) client for Android — a fork of the [ics-openvpn](https://github.com/schwabe/ics-openvpn) v0.7.64 project.**
 
-- **Оригинальное ядро:** [Arne Schwabe](https://github.com/schwabe)
-- **Своя оболочка:** `app` на Kotlin (`com.mropenovpn.client`)
-- **Лицензия:** [GNU GPL v3](LICENSE)
+- **Original core:** [Arne Schwabe](https://github.com/schwabe)
+- **Custom shell:** Kotlin `app` module (`com.mropenvpn.client`)
+- **License:** [GNU GPL v3](LICENSE)
 
-Простой Android-клиент, который подключается к OpenVPN-серверу по готовому `.ovpn`-файлу — без лишних настроек и регистраций. Импортировал профиль, нажал **Connect** — работает.
+A simple Android client that connects to an OpenVPN server using a ready-made `.ovpn` file — no extra configuration or registration required. Import a profile, click **Connect** — and it works.
 
-## Возможности
+## Features
 
-- Импорт любого `.ovpn`/`.conf`-профиля из системного файлового менеджера (режим `tun`, те же ограничения, что у OpenVPN for Android).
-- Парсинг конфига и хранение профилей локально (`ConfigParser`/`ProfileManager`).
-- Статус подключения прямо на главном экране и отключение в один тап.
-- Тайл в **быстрых настройках** — с иконкой **MR** и подписью **MrOpenVPN**. Тап — подключить, ещё тап — отключить.
-- Автоматическое переподключение при смене сети (Wi-Fi ↔ мобильные данные) с защитой от «шторма» сетевых событий.
+- **Import any `.ovpn`/`.conf` profile** from the system file manager. The profile name is taken from the file name (the extension is stripped); on collision a `(2)`, `(3)` suffix is added automatically.
+- **Connection status window** on the home screen with an animated accent outline, plus a **Disconnect** button.
+- **Saved users (accounts):** store a login/password once, attach a user to a profile, or enter credentials at connect time. Interactive `auth-user-pass` requests are handled internally.
+- **Experimental themes:** Black, White, Neon Grid, Lime Amoled, Paper Desk, Red Line, Mint — with an **accent color picker** (including custom HEX values, applied immediately).
+- **Outline animations** for the status window and the selected profile: Pulse, Blink, Rainbow, Throb, or off — with an option to sync all animations to the status window.
+- **Language selection** — English / Русский.
+- **Persistent notification** with connection status and a Disconnect button.
+- **Quick Settings tile** with the **square** icon and the **MrOpenVPN** label. Tap to connect, tap again to disconnect.
+- **Auto-connect** to the last profile on app start, **pause when the screen is off**, and **reconnect on network change** (with protection from network event "storms").
+- **Debug mode** (disabled by default): Copy log button, show/hide notification, delete all users, full app data reset.
 
-# Локальная разработка
+# Local Development
 
-### Клонирование репозитория
+### Cloning a Repository
 
 ```
 git clone https://github.com/byMr712/MrOpenVPNClient.git
 ```
 
-### Открытие проекта
+### Opening a Project
 
-Откройте папку проекта в **Android Studio** (требуется версия 2024.2 или новее, JDK 17 в комплекте).
+Open the project folder in **Android Studio** (requires version 2024.2 or later, JDK 17 included).
 
-### Сборка
+### Build
 
-Из корня проекта — из терминала, либо конфигурация `app` в Android Studio:
+From the project root — from the terminal, or the 'app' configuration in Android Studio:
 
 ```
 ./gradlew :app:assembleDebug
 ```
 
-На Windows:
+On Windows:
 
 ```
 gradlew.bat :app:assembleDebug
 ```
 
-На первый сборке Android Studio предложит доустановить компоненты SDK (Platform 34).
+On the first build, Android Studio will prompt you to install additional SDK components (Platform 34).
 
-## Установка
+## Installation
 
-APK появится в `app/build/outputs/apk/debug/app-debug.apk`. Установить на устройство:
+The APK will appear in `app/build/outputs/apk/debug/app-debug.apk`. Install on device:
 
 ```
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-# Использование
+## Virus check
 
-1. Тапните **Import .ovpn profile** и выберите свой `.ovpn`-файл.
-2. Тапните **Connect** рядом с импортированным профилем и подтвердите разрешение VPN.
-3. Состояние соединения видно в уведомлении и на главном экране; остановить можно кнопкой **Disconnect**.
+You can check a released APK for viruses on **VirusTotal**:
 
-## Быстрые настройки
+[Check MrOpenVPN Client v1.1 on VirusTotal](https://www.virustotal.com/gui/file/105c8d571f4b2b3084145ce6353ca6f2c530790f13f2e8cc8d926b3980b3eb07?nocache=1)
 
-В панели быстрых настроек доступен тайл **MrOpenVPN** (иконка — буквы **MR**). Он подключает последний использованный профиль (или единственный импортированный), повторный тап — отключает. Пока VPN активен, тайл подсвечен. Если профилей ещё нет, тайл откроет приложение, чтобы вы импортировали его.
+# Usage
 
-# Заметки
+1. Tap **Import .ovpn profile** and select your `.ovpn` file.
+2. If the profile requires a login, enter your credentials (or pick a saved user).
+3. Tap **Connect** next to the imported profile and confirm the permission to connect to the VPN.
+4. The connection status is visible in the notification and on the main screen; you can stop it by pressing **Disconnect**.
 
-- Поддерживаются только конфиги в режиме `tun` — `tap` парсер отклонит.
-- Логин/пароль работают со встроенными в конфиг `auth-user-pass`; интерактивные запросы обрабатываются `LaunchVPN` внутри библиотеки.
-- Векторные иконки приложения и тайла — это буквы **MR**.
+## Quick Settings
 
-# Лицензия
+The **MrOpenVPN** tile (icon: **square**) is available in the Quick Settings panel. It connects the last used profile (or the only imported profile); tapping it again disconnects it. While the VPN is active, the tile is highlighted. If there are no profiles yet, the tile opens the app so you can import one.
 
-GPL v3. Исходный код приложения — `com.mropenovpn.client`; модуль `vpnlib` основан на [openvpn-lib-for-android](https://github.com/cucongcan/openvpn-lib-for-android) (GPL v3), который в свою очередь основан на [ics-openvpn](https://github.com/schwabe/ics-openvpn) (GPL v2, © 2012–2022 Arne Schwabe, с дополнительными условиями; см. `vpnlib/doc/LICENSE.txt`). Встроенный исполняемый файл OpenVPN — GPL v2 (OpenVPN 3.x — AGPL). Подробнее см. `LICENSE` и `vpnlib/LICENSE`.
+# Notes
+
+- Only tun mode configurations are supported; anything else is rejected by the parser.
+- Login/password work with the built-in `auth-user-pass` config; interactive requests are handled by `LaunchVPN` internally by the library.
+- The app's main and tile icons are the letters **square**.
+- Debug mode is intended for troubleshooting — deleting all users or resetting the app data is irreversible (both actions require confirmation).
+
+# License
+
+GPL v3. The application source code is `com.mropenvpn.client`; the `vpnlib` module is based on [openvpn-lib-for-android](https://github.com/cucongcan/openvpn-lib-for-android) (GPL v3), which in turn is based on [ics-openvpn](https://github.com/schwabe/ics-openvpn) (GPL v2, © 2012–2022 Arne Schwabe, with additional terms; see `vpnlib/doc/LICENSE.txt`). The built-in OpenVPN executable is GPL v2 (OpenVPN 3.x is AGPL). See `LICENSE` and `vpnlib/LICENSE` for details.

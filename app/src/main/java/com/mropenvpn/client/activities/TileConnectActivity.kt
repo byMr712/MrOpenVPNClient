@@ -1,12 +1,12 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.app.Activity
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
-import com.mropenovpn.client.BaseActivity
-import com.mropenovpn.client.VpnPrefs
+import com.mropenvpn.client.BaseActivity
+import com.mropenvpn.client.VpnPrefs
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ProfileManager
 import de.blinkt.openvpn.core.VPNLaunchHelper

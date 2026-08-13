@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.mropenovpn.client"
+    namespace = "com.mropenvpn.client"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mropenovpn.client"
+        applicationId = "com.mropenvpn.client"
         minSdk = 24
         targetSdk = 34
         versionCode = 2
@@ -19,7 +19,7 @@ android {
         create("release") {
             storeFile = rootProject.file("keystore/release.jks")
             storePassword = "android"
-            keyAlias = "androiddebugkey"
+            keyAlias = "Mr712"
             keyPassword = "android"
         }
     }

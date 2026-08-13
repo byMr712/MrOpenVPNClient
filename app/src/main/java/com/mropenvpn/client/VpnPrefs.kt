@@ -1,6 +1,7 @@
-package com.mropenovpn.client
+package com.mropenvpn.client
 
 import android.content.Context
+import de.blinkt.openvpn.core.ProfileManager
 
 object VpnPrefs {
     private const val FILE = "vpn_prefs"
@@ -63,10 +64,14 @@ object VpnPrefs {
             ?: "en"
 
     fun setLanguage(context: Context, tag: String) {
+        // commit() is required here: AppCompatDelegate.setApplicationLocales()
+        // triggers an activity (or process) restart, and an async apply() could
+        // be lost before the write reaches disk, leaving the saved language
+        // (and therefore the selected language radio) out of sync with the UI.
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_LANGUAGE, tag)
-            .apply()
+            .commit()
     }
 
     fun accentColor(context: Context): String =
@@ -179,6 +184,19 @@ object VpnPrefs {
 
     fun clearUsers(context: Context) {
         VpnUsers.clearAll(context)
+    }
+
+    fun clearAllData(context: Context) {
+        ProfileManager.clearAll(context)
+        VpnUsers.clearAll(context)
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .clear()
+            .commit()
+        context.getSharedPreferences(context.packageName + "_preferences", Context.MODE_PRIVATE)
+            .edit()
+            .clear()
+            .apply()
     }
 
     private fun vpnPrefs(context: Context) =

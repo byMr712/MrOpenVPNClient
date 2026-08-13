@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="notifcation_title">%1$s</string>
+    <string name="notifcation_title">Профиль: %1$s</string>
     <string name="notifcation_title_notconnect">MrOpenVPN Client</string>
+    <string name="state_userpause">Пауза запрошена пользователем</string>
+    <string name="state_connection_paused">Соединение на паузе</string>
+    <string name="state_screenoff">VPN на паузе — экран выключен</string>
+    <string name="state_nonetwork">Ожидание доступной сети</string>
     <string name="cancel_connection">Отключить</string>
     <string name="cancel_connection_long">Отключить VPN</string>
     <string name="pauseVPN">Пауза</string>

@@ -1,8 +1,9 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -13,8 +14,10 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -24,19 +27,17 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
-import androidx.core.os.LocaleListCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
-import com.mropenovpn.client.BaseActivity
-import com.mropenovpn.client.ExperimentalThemes
-import com.mropenovpn.client.R
-import com.mropenovpn.client.VpnPrefs
-import com.mropenovpn.client.VpnTileManager
-import com.mropenovpn.client.VpnUsers
+import com.mropenvpn.client.BaseActivity
+import com.mropenvpn.client.ExperimentalThemes
+import com.mropenvpn.client.R
+import com.mropenvpn.client.VpnPrefs
+import com.mropenvpn.client.VpnTileManager
+import com.mropenvpn.client.VpnUsers
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ConfigParser
 import de.blinkt.openvpn.core.ConnectionStatus
@@ -107,20 +108,23 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         }
 
         applyExperimentalTheme()
+        applyAccentUi()
 
         findViewById<View>(R.id.statusCard).setOnClickListener {
-            if (VpnStatus.isVPNActive()) {
-                disconnectCurrent()
-            } else {
-                val profile = VpnPrefs.lastProfileUuid(this)?.let { uuid ->
-                    ProfileManager.getInstance(this)
-                        .getProfiles()
-                        .firstOrNull { it.uuid.toString() == uuid }
-                }
-                if (profile != null) {
-                    connectToProfile(profile)
-                } else {
-                    Toast.makeText(this, R.string.no_profiles, Toast.LENGTH_SHORT).show()
+            when {
+                OpenVPNService.isUserPaused() -> resumeCurrent()
+                VpnStatus.isVPNActive() -> disconnectCurrent()
+                else -> {
+                    val profile = VpnPrefs.lastProfileUuid(this)?.let { uuid ->
+                        ProfileManager.getInstance(this)
+                            .getProfiles()
+                            .firstOrNull { it.uuid.toString() == uuid }
+                    }
+                    if (profile != null) {
+                        connectToProfile(profile)
+                    } else {
+                        Toast.makeText(this, R.string.no_profiles, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -195,17 +199,6 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         val navView = findViewById<NavigationView>(R.id.navView)
         applyNavAccent(navView)
 
-        val currentLang = VpnPrefs.language(this)
-        val languageEntryText = findViewById<TextView>(R.id.languageEntryText)
-        languageEntryText.text = if (currentLang == "ru") getString(R.string.language_ru)
-        else getString(R.string.language_en)
-
-        findViewById<View>(R.id.languageEntry).setOnClickListener {
-            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
-            val next = if (VpnPrefs.language(this) == "ru") "en" else "ru"
-            setAppLanguage(next)
-        }
-
         findViewById<android.widget.ImageButton>(R.id.menuButton).setOnClickListener {
             drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
         }
@@ -232,9 +225,21 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         }
     }
 
-    private fun setAppLanguage(tag: String) {
-        VpnPrefs.setLanguage(this, tag)
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+    private fun applyAccentUi() {
+        val accent = ExperimentalThemes.accentOrDefaultColor(
+            this,
+            themeColor(com.google.android.material.R.attr.colorPrimary)
+        )
+        findViewById<View>(R.id.drawerDividerTop).background = ColorDrawable(accent)
+        findViewById<View>(R.id.drawerDividerBottom).background = ColorDrawable(accent)
+
+        listOf(
+            findViewById<com.google.android.material.button.MaterialButton>(R.id.addProfileButton),
+            findViewById<com.google.android.material.button.MaterialButton>(R.id.copyLogButton)
+        ).forEach { button ->
+            button.strokeColor = ColorStateList.valueOf(accent)
+            button.setTextColor(accent)
+        }
     }
 
     private fun applyNavAccent(navView: NavigationView) {
@@ -274,18 +279,49 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         }.getOrNull() ?: "1.0"
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_about, null)
         view.findViewById<TextView>(R.id.aboutTitle).text = getString(R.string.app_name)
+        view.findViewById<TextView>(R.id.aboutDeveloper).text =
+            getString(R.string.about_developer, "Mr712")
         view.findViewById<TextView>(R.id.aboutVersion).text =
             getString(R.string.about_version, version)
-        view.findViewById<TextView>(R.id.aboutSource).setOnClickListener {
-            startActivity(
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/byMr712/MrOpenVPNClient"))
-            )
-        }
+        view.findViewById<com.google.android.material.card.MaterialCardView>(R.id.aboutSource)
+            .setOnClickListener {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/byMr712/MrOpenVPNClient")
+                    )
+                )
+            }
         AlertDialog.Builder(this)
             .setView(view)
             .setPositiveButton(R.string.close, null)
             .show()
-            .also { ExperimentalThemes.applyAccentToDialog(it) }
+            .also { dialog ->
+                ExperimentalThemes.applyAccentToDialog(dialog)
+                startAboutSourceAnimation(view, dialog)
+            }
+    }
+
+    private fun startAboutSourceAnimation(
+        view: View,
+        dialog: android.app.AlertDialog
+    ) {
+        val card =
+            view.findViewById<com.google.android.material.card.MaterialCardView>(R.id.aboutSource)
+        val density = resources.displayMetrics.density
+        val ta = theme.obtainStyledAttributes(
+            intArrayOf(com.google.android.material.R.attr.colorSurface)
+        )
+        val surface = ta.getColor(0, Color.BLACK)
+        ta.recycle()
+
+        card.setCardBackgroundColor(surface)
+        card.cardElevation = 0f
+        card.radius = 16 * density
+
+        val animator = StatusOutlineAnimator(this, card)
+        animator.setState(StatusOutlineAnimator.State.CONNECTING)
+        dialog.setOnDismissListener { animator.stop() }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -331,12 +367,16 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             level == ConnectionStatus.LEVEL_WAITING_FOR_USER_INPUT ||
             level == ConnectionStatus.LEVEL_VPNPAUSED
 
+    private fun isPaused(): Boolean =
+        lastLevel == ConnectionStatus.LEVEL_VPNPAUSED || OpenVPNService.isUserPaused()
+
     private fun updateStatusLevel(level: ConnectionStatus) {
         lastLevel = level
         val error = level == ConnectionStatus.LEVEL_AUTH_FAILED ||
             level == ConnectionStatus.LEVEL_NONETWORK
         statusLevelText.text = when {
             level == ConnectionStatus.LEVEL_CONNECTED -> getString(R.string.state_connected)
+            isPaused() -> getString(R.string.state_paused)
             error -> getString(R.string.state_error)
             isConnecting(level) -> getString(R.string.state_connecting)
             else -> getString(R.string.state_disconnected)
@@ -419,11 +459,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         fun refreshUserSelect(select: String? = null) {
             val users = VpnUsers.users(this)
             val items = mutableListOf(getString(R.string.no_account)).apply { addAll(users) }
-            userSelect.adapter = ArrayAdapter(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                items
-            )
+            userSelect.adapter = AccentSpinnerAdapter(this, items)
             val target = select ?: profile.mUsername
             val index = if (target.isNotEmpty()) users.indexOf(target) else -1
             userSelect.setSelection(if (index >= 0) index + 1 else 0)
@@ -512,9 +548,10 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 if (username.isEmpty() || password.isEmpty()) {
                     Toast.makeText(this, R.string.credentials_required, Toast.LENGTH_LONG).show()
                 } else {
-                    VpnUsers.save(this, username, password)
-                    VpnStatus.logInfo(R.string.user_added, username)
-                    onUserAdded(username)
+                    val finalName = VpnUsers.uniqueName(this, username)
+                    VpnUsers.save(this, finalName, password)
+                    VpnStatus.logInfo(R.string.user_added, finalName)
+                    onUserAdded(finalName)
                 }
             }
             .setNegativeButton(R.string.close, null)
@@ -531,11 +568,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
 
         val savedUsers = VpnUsers.users(this)
         val userItems = mutableListOf(getString(R.string.new_user)).apply { addAll(savedUsers) }
-        userSelect.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            userItems
-        )
+        userSelect.adapter = AccentSpinnerAdapter(this, userItems)
 
         userInput.setText(profile.mUsername)
         val existingIndex = savedUsers.indexOf(profile.mUsername)
@@ -599,6 +632,12 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         Toast.makeText(this, getString(R.string.log_copied, lines), Toast.LENGTH_SHORT).show()
     }
 
+    private fun resumeCurrent() {
+        val intent = Intent(this, OpenVPNService::class.java)
+        intent.action = OpenVPNService.RESUME_VPN
+        startService(intent)
+    }
+
     private fun disconnectCurrent() {
         val intent = Intent(this, OpenVPNService::class.java)
         intent.action = OpenVPNService.DISCONNECT_VPN
@@ -620,7 +659,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
                 parser.parseConfig(BufferedReader(InputStreamReader(it)))
             }
             val profile = parser.convertProfile()
-            profile.mName = nextNumberedName()
+            profile.mName = uniqueName(fileNameForUri(uri) ?: getString(R.string.imported_profile))
 
             val pm = ProfileManager.getInstance(this)
             pm.addProfile(profile)
@@ -657,14 +696,22 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         return "$base ($i)"
     }
 
-    private fun nextNumberedName(): String {
-        val names = ProfileManager.getInstance(this)
-            .getProfiles()
-            .map { it.mName }
-            .toMutableSet()
-        var i = 1
-        while ("$i" in names) i++
-        return i.toString()
+    private fun fileNameForUri(uri: Uri): String? {
+        var name: String? = null
+        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (index >= 0 && cursor.moveToFirst()) {
+                name = cursor.getString(index)
+            }
+        }
+        if (name == null) {
+            name = uri.lastPathSegment?.substringAfterLast('/')
+        }
+        val current = name
+        if (current != null) {
+            name = current.substringBeforeLast('.', current)
+        }
+        return name?.trim()?.takeIf { it.isNotEmpty() }
     }
 
     private fun refreshProfileList() {
@@ -684,6 +731,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
         statusLevelText.text = getString(
             when {
                 level == ConnectionStatus.LEVEL_CONNECTED -> R.string.state_connected
+                isPaused() -> R.string.state_paused
                 isConnecting(level) -> R.string.state_connecting
                 else -> R.string.state_disconnected
             }
@@ -704,6 +752,32 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             PackageManager.PERMISSION_GRANTED
         ) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private class AccentSpinnerAdapter(
+        context: Context,
+        items: List<String>
+    ) : ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, items) {
+
+        private val accent = ExperimentalThemes.accentOrDefaultColor(
+            context,
+            primaryColor(context)
+        )
+
+        private fun primaryColor(context: Context): Int {
+            val ta = context.theme.obtainStyledAttributes(
+                intArrayOf(com.google.android.material.R.attr.colorPrimary)
+            )
+            val color = ta.getColor(0, Color.BLACK)
+            ta.recycle()
+            return color
+        }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = super.getDropDownView(position, convertView, parent)
+            (view as TextView).setTextColor(accent)
+            return view
         }
     }
 

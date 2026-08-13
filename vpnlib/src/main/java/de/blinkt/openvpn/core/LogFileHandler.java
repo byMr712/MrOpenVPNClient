@@ -32,6 +32,7 @@ class LogFileHandler extends Handler {
     static final int FLUSH_TO_DISK = 101;
     static final int LOG_INIT = 102;
     public static final int LOG_MESSAGE = 103;
+    static final int LOG_CLOSE = 104;
     public static final int MAGIC_BYTE = 0x55;
     protected OutputStream mLogFile;
 
@@ -62,6 +63,16 @@ class LogFileHandler extends Handler {
                     writeLogItemToDisk(li);
             } else if (msg.what == FLUSH_TO_DISK) {
                 flushToDisk();
+            } else if (msg.what == LOG_CLOSE) {
+                if (mLogFile != null) {
+                    try {
+                        mLogFile.flush();
+                        mLogFile.close();
+                    } catch (IOException ignored) {
+                    }
+                    mLogFile = null;
+                }
+                getLooper().quitSafely();
             }
 
         } catch (IOException | BufferOverflowException e) {

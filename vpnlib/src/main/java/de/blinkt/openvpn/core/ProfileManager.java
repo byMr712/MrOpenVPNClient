@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -373,5 +374,16 @@ public class ProfileManager {
         if (mLastConnectedVpn == profile)
             mLastConnectedVpn = null;
 
+    }
+
+    public static synchronized void clearAll(Context context) {
+        ProfileManager pm = getInstance(context);
+        for (VpnProfile profile : new ArrayList<>(pm.profiles.values())) {
+            pm.removeProfile(context, profile);
+        }
+        SharedPreferences listpref = Preferences.getSharedPreferencesMulti(PREFS_NAME, context);
+        listpref.edit().clear().apply();
+        setConntectedVpnProfileDisconnected(context);
+        mLastConnectedVpn = null;
     }
 }

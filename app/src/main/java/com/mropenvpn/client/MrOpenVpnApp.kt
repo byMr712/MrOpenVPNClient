@@ -1,4 +1,4 @@
-package com.mropenovpn.client
+package com.mropenvpn.client
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
@@ -14,7 +14,9 @@ class MrOpenVpnApp : Application() {
             else AppCompatDelegate.MODE_NIGHT_NO
         )
         OpenVPNService.setNotificationVisible(VpnPrefs.notifyEnabled(this))
-        VpnStatus.initLogCache(cacheDir)
+        if (VpnPrefs.debugMode(this)) {
+            VpnStatus.initLogCache(cacheDir)
+        }
         VpnPrefs.forceNetChangeReconnect(this)
     }
 }

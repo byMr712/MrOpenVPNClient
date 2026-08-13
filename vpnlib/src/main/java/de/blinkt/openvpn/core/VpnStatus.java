@@ -128,14 +128,26 @@ public class VpnStatus {
     }
 
     public static void initLogCache(File cacheDir) {
-        mHandlerThread = new HandlerThread("LogFileWriter", Thread.MIN_PRIORITY);
-        mHandlerThread.start();
-        mLogFileHandler = new LogFileHandler(mHandlerThread.getLooper());
-
+        synchronized (VpnStatus.class) {
+            if (mLogFileHandler != null)
+                return;
+            mHandlerThread = new HandlerThread("LogFileWriter", Thread.MIN_PRIORITY);
+            mHandlerThread.start();
+            mLogFileHandler = new LogFileHandler(mHandlerThread.getLooper());
+        }
 
         Message m = mLogFileHandler.obtainMessage(LogFileHandler.LOG_INIT, cacheDir);
         mLogFileHandler.sendMessage(m);
 
+    }
+
+    public static void stopLogCache() {
+        synchronized (VpnStatus.class) {
+            if (mLogFileHandler == null)
+                return;
+            mLogFileHandler.sendEmptyMessage(LogFileHandler.LOG_CLOSE);
+            mLogFileHandler = null;
+        }
     }
 
     public static void flushLog() {

@@ -1,4 +1,4 @@
-package com.mropenovpn.client.activities
+package com.mropenvpn.client.activities
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -17,10 +17,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.radiobutton.MaterialRadioButton
-import com.mropenovpn.client.BaseActivity
-import com.mropenovpn.client.ExperimentalThemes
-import com.mropenovpn.client.R
-import com.mropenovpn.client.VpnPrefs
+import com.mropenvpn.client.BaseActivity
+import com.mropenvpn.client.ExperimentalThemes
+import com.mropenvpn.client.R
+import com.mropenvpn.client.VpnPrefs
 import java.util.Locale
 
 class ExperimentalThemesActivity : BaseActivity() {

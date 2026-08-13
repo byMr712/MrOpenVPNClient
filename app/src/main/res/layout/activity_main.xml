@@ -125,41 +125,12 @@
             app:menu="@menu/drawer_menu" />
 
         <View
+            android:id="@+id/drawerDividerTop"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:background="?attr/colorPrimary" />
-
-        <TextView
-            android:id="@+id/languageSectionLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="4dp"
-            android:text="@string/language_section"
-            android:textAppearance="?attr/textAppearanceLabelLarge"
-            android:textColor="?attr/colorOnSurface" />
-
-        <LinearLayout
-            android:id="@+id/languageEntry"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
-
-            <TextView
-                android:id="@+id/languageEntryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="?attr/colorOnSurface" />
-        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -167,6 +138,7 @@
             android:layout_weight="1" />
 
         <View
+            android:id="@+id/drawerDividerBottom"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginStart="16dp"
