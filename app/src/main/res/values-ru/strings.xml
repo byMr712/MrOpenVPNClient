@@ -103,6 +103,8 @@
     <string name="settings_auto_connect_summary">Подключаться к последнему профилю при запуске приложения</string>
     <string name="settings_screen_off">Пауза при выключенном экране</string>
     <string name="settings_screen_off_summary">Приостанавливать VPN, когда экран выключен</string>
+    <string name="settings_full_tunnel">Весь трафик через VPN</string>
+    <string name="settings_full_tunnel_summary">Если отключено, то через VPN идёт только локальный трафик, например 192.XXX.X.X</string>
     <string name="settings_net_change_reconnect">Переподключаться при смене сети</string>
     <string name="settings_net_change_reconnect_summary">Перезапускать соединение при потере сети</string>
     <string name="settings_debug_mode">Режим отладки</string>

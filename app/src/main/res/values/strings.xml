@@ -103,6 +103,8 @@
     <string name="settings_auto_connect_summary">Connect to the last profile when the app starts</string>
     <string name="settings_screen_off">Pause when screen is off</string>
     <string name="settings_screen_off_summary">Pause the VPN when the screen is off</string>
+    <string name="settings_full_tunnel">Route all traffic through VPN</string>
+    <string name="settings_full_tunnel_summary">If disabled, only local traffic goes through the VPN, e.g. 192.XXX.X.X</string>
     <string name="settings_net_change_reconnect">Reconnect on network change</string>
     <string name="settings_net_change_reconnect_summary">Restart the connection when the network is lost</string>
     <string name="settings_debug_mode">Debug mode</string>

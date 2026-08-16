@@ -63,6 +63,7 @@ abstract class VpnTileBase(private val slot: Int) : TileService(), VpnStatus.Sta
                     .putExtra(TileConnectActivity.EXTRA_PROFILE_UUID, profile.uuid.toString())
             )
         } else {
+            VpnPrefs.applyRouteToProfile(this, profile)
             VPNLaunchHelper.startOpenVpn(profile, this, "quick settings tile", true)
         }
     }

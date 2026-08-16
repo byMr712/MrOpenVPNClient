@@ -63,6 +63,7 @@ class TileConnectActivity : BaseActivity() {
     private fun startVpn() {
         profile?.let {
             VpnPrefs.setLastProfileUuid(this, it.uuid.toString())
+            VpnPrefs.applyRouteToProfile(this, it)
             VPNLaunchHelper.startOpenVpn(it, applicationContext, "quick settings tile", true)
         }
     }

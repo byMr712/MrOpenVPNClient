@@ -85,6 +85,12 @@ class SettingsActivity : BaseActivity() {
             VpnPrefs.setScreenOffPause(this, checked)
         }
 
+        val swFullTunnel = findViewById<MaterialSwitch>(R.id.swFullTunnel)
+        swFullTunnel.isChecked = VpnPrefs.fullTunnel(this)
+        swFullTunnel.setOnCheckedChangeListener { _, checked ->
+            VpnPrefs.setFullTunnel(this, checked)
+        }
+
         findViewById<TextView>(R.id.clearUsersButton).setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle(R.string.clear_users)

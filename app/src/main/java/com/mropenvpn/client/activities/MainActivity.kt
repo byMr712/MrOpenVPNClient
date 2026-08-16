@@ -427,6 +427,7 @@ class MainActivity : BaseActivity(), VpnStatus.StateListener {
             showCredentialsDialog(profile)
             return
         }
+        VpnPrefs.applyRouteToProfile(this, profile)
         try {
             VpnStatus.logDebug("Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
             val cfg = profile.getConfigFile(applicationContext, false)

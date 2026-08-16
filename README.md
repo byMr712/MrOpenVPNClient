@@ -61,7 +61,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 You can check a released APK for viruses on **VirusTotal**:
 
-[Check MrOpenVPN Client v1.1 on VirusTotal](https://www.virustotal.com/gui/file/105c8d571f4b2b3084145ce6353ca6f2c530790f13f2e8cc8d926b3980b3eb07?nocache=1)
+[Check MrOpenVPN Client v1.1 on VirusTotal](https://www.virustotal.com/gui/file/c2eee8eb6fd96d4b577806d82d50bfeaabfb93818709b8c6a2fbc19e8926df01?nocache=1)
 
 # Usage
 

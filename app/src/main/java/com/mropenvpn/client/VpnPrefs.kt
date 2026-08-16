@@ -9,6 +9,7 @@ object VpnPrefs {
     private const val KEY_AUTO_CONNECT = "auto_connect"
 
     private const val KEY_SCREENOFF = "screenoff"
+    private const val KEY_FULL_TUNNEL = "full_tunnel"
     private const val KEY_NET_CHANGE_RECONNECT = "netchangereconnect"
     private const val KEY_LANGUAGE = "language"
     private const val KEY_DEBUG_MODE = "debug_mode"
@@ -176,6 +177,21 @@ object VpnPrefs {
 
     fun setScreenOffPause(context: Context, value: Boolean) {
         vpnPrefs(context).edit().putBoolean(KEY_SCREENOFF, value).apply()
+    }
+
+    fun fullTunnel(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getBoolean(KEY_FULL_TUNNEL, true)
+
+    fun setFullTunnel(context: Context, value: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_FULL_TUNNEL, value)
+            .apply()
+    }
+
+    fun applyRouteToProfile(context: Context, profile: de.blinkt.openvpn.VpnProfile) {
+        profile.mUseDefaultRoute = fullTunnel(context)
     }
 
     fun forceNetChangeReconnect(context: Context) {
